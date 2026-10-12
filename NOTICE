@@ -1,0 +1,11 @@
+BinSentinel (bin-sentinel)
+Copyright 2026 GHSFS (https://github.com/GHSFS)
+
+This product includes original zero-dependency PE32/PE32+/ELF binary parsers,
+statistical entropy and packer heuristic analyzers, static IoC string extractors,
+and verified declarative byte-patching engines developed by GHSFS.
+
+Licensed under the Apache License, Version 2.0 (the "License").
+Any redistribution or derivative work in Source or Object form must retain
+this NOTICE file and the attribution to GHSFS pursuant to Section 4(d) of
+the Apache License, Version 2.0.

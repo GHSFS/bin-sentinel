@@ -1,0 +1,163 @@
+<div align="center">
+
+[🇺🇸 English](../../README.md) · [🇰🇷 한국어](./ko.md) · [🇨🇳 中文](./zh-CN.md) · **🇪🇸 Español** · [🇮🇳 हिन्दी](./hi.md) · [🇸🇦 العربية](./ar.md) · [🇧🇷 Português](./pt-BR.md) · [🇷🇺 Русский](./ru.md) · [🇫🇷 Français](./fr.md) · [🇮🇩 Bahasa Indonesia](./id.md)
+
+</div>
+<br>
+
+<p align="center">
+  <img src="../assets/locales/es/banner.svg" alt="BinSentinel (bsentinel) banner" width="100%" />
+</p>
+
+<div align="center">
+
+# 🛡️ BinSentinel (bsentinel)
+
+**Análisis Forense Binario Sin Dependencias, Analizador Estático PE/ELF, Detector de Entropía y Parcheo de Bytes**
+
+[![CI](https://github.com/GHSFS/bin-sentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/GHSFS/bin-sentinel/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../../LICENSE)
+[![Rust](https://img.shields.io/badge/Rust-1.75%2B_Safe-orange.svg)](../../SECURITY.md)
+[![Roadmap](https://img.shields.io/badge/Roadmap-Active-10b981.svg)](../../ROADMAP.md)
+
+</div>
+
+---
+
+## 🔍 Descripción General
+
+<details open>
+<summary><b>🔍 Descripción General</b></summary>
+<br>
+
+bin-sentinel (bsentinel) es una herramienta de línea de comandos en un único binario escrita en Rust seguro para el análisis estático de ejecutables, triaje de ingeniería inversa y aplicación declarativa de parches binarios.
+
+</details>
+
+---
+
+## 🏛️ Arquitectura Principal y Flujo de Inspección
+
+<details open>
+<summary><b>🏛️ Arquitectura Principal y Flujo de Inspección</b></summary>
+<br>
+
+<p align="center">
+  <img src="../assets/locales/es/architecture.svg" alt="Arquitectura Principal y Flujo de Inspección" width="100%" />
+</p>
+
+| # | Módulo | Archivo Fuente | Capacidad Clave e Invariante de Seguridad |
+|---|---|---|---|
+| **01** | **Analizador Estático PE32/PE32+** | `src/pe.rs` | Análisis con validación de límites para cabeceras DOS/COFF/Optional, ASLR/DEP/CFG y anomalías RWX |
+| **02** | **Entropía y Heurística de Packers** | `src/entropy.rs` | Entropía de Shannon (0..8 bits/B), prueba Chi-Cuadrado y detección de UPX/VMProtect/Themida |
+| **03** | **Escáner de Cadenas e IoCs** | `src/strings.rs` | Extrae cadenas ASCII y UTF-16LE y clasifica URLs, IPv4, claves de registro y APIs Win32 |
+| **04** | **Motor de Parcheo Declarativo** | `src/patch.rs` | Verificación en tiempo constante, resúmenes SHA-256 antes/después, copia .bak y Zeroize |
+| **05** | **CLI Estructurada y Salida JSON** | `src/cli.rs` | Generador PE64 sintético determinista y modo --json para tuberías de automatización |
+
+</details>
+
+---
+
+## ⚡ Inicio Rápido y Uso de CLI
+
+<details open>
+<summary><b>⚡ Inicio Rápido y Uso de CLI</b></summary>
+<br>
+
+```bash
+# 1. Build release binary
+cargo build --release
+
+# 2. Generate a deterministic synthetic PE32+ (64-bit) test binary
+bsentinel synth-pe sample.exe
+
+# 3. Inspect PE headers, ASLR/DEP/CFG mitigations, section table & packer heuristics
+bsentinel inspect sample.exe
+bsentinel inspect sample.exe --json
+
+# 4. Run statistical Shannon entropy & Chi-square uniformity analysis
+bsentinel entropy sample.exe --window 512
+bsentinel entropy sample.exe --window 512 --json
+
+# 5. Extract printable ASCII & UTF-16LE strings and filter Indicators of Compromise (IoCs)
+bsentinel strings sample.exe --min-len 4
+bsentinel strings sample.exe --ioc-only --json
+
+# 6. Apply a verified declarative byte patch with expected-byte check and .bak backup
+bsentinel patch sample.exe --offset 0x200 --expect 4883EC28 --replace 90909090 --backup --json
+```
+
+</details>
+
+---
+
+## 📦 Estructura del Repositorio
+
+<details open>
+<summary><b>📦 Estructura del Repositorio</b></summary>
+<br>
+
+```text
+bin-sentinel/
+├── Cargo.toml                     # Pure-Rust package manifest (bsentinel binary + bin_sentinel lib)
+├── README.md                      # Root English documentation with 10-language navigation
+├── ROADMAP.md                     # Public engineering roadmap
+├── CHANGELOG.md                   # Keep-a-Changelog release history
+├── SECURITY.md                    # Binary parsing & memory safety policy
+├── LICENSE                        # Apache License 2.0
+├── NOTICE                         # Attribution notice owned by GHSFS
+├── src/
+│   ├── lib.rs                     # Library module exports
+│   ├── main.rs                    # CLI entry point & human/JSON output formatting
+│   ├── cli.rs                     # Clap derive subcommands (inspect, entropy, strings, patch, synth-pe)
+│   ├── error.rs                   # Unified SentinelError & Result<T>
+│   ├── pe.rs                      # Zero-dependency PE32/PE32+ header & section parser + synthetic PE64 builder
+│   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
+│   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
+│   └── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
+├── tests/
+│   ├── pe_entropy_test.rs         # Integration tests for PE64 parsing, mitigations, entropy & CLI JSON
+│   └── patch_strings_test.rs      # Integration tests for IoC extraction, verified patching & backups
+└── docs/
+    ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
+    └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams
+```
+
+</details>
+
+---
+
+## 🔒 Seguridad de Memoria e Invariantes
+
+<details open>
+<summary><b>🔒 Seguridad de Memoria e Invariantes</b></summary>
+<br>
+
+- 🛡️ Cero bloques unsafe en todos los analizadores binarios; aritmética verificada contra desbordamientos.
+- 🛡️ Comparación en tiempo constante (constant_time_eq) antes de modificar cualquier byte en disco.
+- 🛡️ Registro criptográfico completo con hashes SHA-256 previos y posteriores al parcheo.
+- 🛡️ Limpieza proactiva de memoria mediante zeroize en los búferes de trabajo.
+
+</details>
+
+---
+
+## 📄 Licencia y Atribución
+
+<details open>
+<summary><b>📄 Licencia y Atribución</b></summary>
+<br>
+
+Publicado bajo Apache License 2.0 con archivo NOTICE. Propiedad de GHSFS.
+
+```text
+Copyright 2026 GHSFS (https://github.com/GHSFS)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+```
+
+</details>

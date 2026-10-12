@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="400" viewBox="0 0 1200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050814"/>
+      <stop offset="50%" stop-color="#0b1329"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.1"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="400" rx="16" fill="url(#bgGrad)"/>
+  <rect x="1" y="1" width="1198" height="398" rx="15" stroke="#1e293b" stroke-width="2"/>
+
+  <g stroke="#334155" stroke-opacity="0.15" stroke-width="1">
+    <line x1="100" y1="0" x2="100" y2="400"/>
+    <line x1="300" y1="0" x2="300" y2="400"/>
+    <line x1="500" y1="0" x2="500" y2="400"/>
+    <line x1="700" y1="0" x2="700" y2="400"/>
+    <line x1="900" y1="0" x2="900" y2="400"/>
+    <line x1="1100" y1="0" x2="1100" y2="400"/>
+    <line x1="0" y1="100" x2="1200" y2="100"/>
+    <line x1="0" y1="200" x2="1200" y2="200"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+  </g>
+
+  <circle cx="600" cy="180" r="140" fill="#38bdf8" opacity="0.06" filter="url(#glow)"/>
+
+  <g transform="translate(600, 70)" text-anchor="middle">
+    <rect x="-170" y="-18" width="340" height="36" rx="18" fill="url(#badgeGrad)" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.6"/>
+    <text y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#38bdf8" letter-spacing="3">
+      ✦ BINSENTINEL FORENSIC ENGINE ✦
+    </text>
+  </g>
+
+  <text x="600" y="150" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="32" font-weight="800" fill="#f8fafc" letter-spacing="-0.5">
+    BinSentinel (bsentinel)
+  </text>
+
+  <text x="600" y="195" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15.5" font-weight="500" fill="#94a3b8">
+    Автономная бинарная криминалистика, статический анализатор PE/ELF, детектор энтропии упаковщиков и патчер байтов
+  </text>
+
+  <g transform="translate(600, 245)" text-anchor="middle">
+    <rect x="-420" y="-18" width="840" height="36" rx="8" fill="#1e293b" fill-opacity="0.8" stroke="#475569" stroke-width="1"/>
+    <text y="5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="600" fill="#38bdf8">
+      Безопасный Rust · Инспектор заголовков PE32/PE32+ · Энтропия Шеннона и Хи-квадрат · Сканер IoC · Верифицированный патчинг
+    </text>
+  </g>
+
+  <g transform="translate(600, 325)" text-anchor="middle">
+    <g transform="translate(-400, 0)">
+      <rect x="-75" y="-16" width="150" height="32" rx="6" fill="#0f172a" stroke="#0ea5e9" stroke-width="1"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">PE32/PE32+ Parser</text>
+    </g>
+    <g transform="translate(-200, 0)">
+      <rect x="-75" y="-16" width="150" height="32" rx="6" fill="#0f172a" stroke="#10b981" stroke-width="1"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">Entropy &amp; Packers</text>
+    </g>
+    <g transform="translate(0, 0)">
+      <rect x="-75" y="-16" width="150" height="32" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="1"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">IoC String Scanner</text>
+    </g>
+    <g transform="translate(200, 0)">
+      <rect x="-75" y="-16" width="150" height="32" rx="6" fill="#0f172a" stroke="#8b5cf6" stroke-width="1"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">Verified Patcher</text>
+    </g>
+    <g transform="translate(400, 0)">
+      <rect x="-75" y="-16" width="150" height="32" rx="6" fill="#0f172a" stroke="#ec4899" stroke-width="1"/>
+      <text y="5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">Pure Safe Rust</text>
+    </g>
+  </g>
+</svg>

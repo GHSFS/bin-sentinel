@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1240" height="660" viewBox="0 0 1240 660" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="arcBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1120"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <rect width="1240" height="660" rx="16" fill="url(#arcBg)"/>
+  <rect x="1" y="1" width="1238" height="658" rx="15" stroke="#334155" stroke-width="2" stroke-opacity="0.5"/>
+
+  <text x="620" y="52" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#f8fafc">
+    Архитектура и конвейер статического анализа
+  </text>
+  <text x="620" y="80" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13.5" font-weight="400" fill="#94a3b8">
+    Автономная бинарная криминалистика, статический анализатор PE/ELF, детектор энтропии упаковщиков и патчер байтов
+  </text>
+
+  <g transform="translate(620, 205)" filter="url(#cardShadow)">
+    <rect x="-175" y="-55" width="350" height="110" rx="14" fill="#1e1b4b" stroke="#6366f1" stroke-width="2"/>
+    <text x="0" y="-20" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="700" fill="#818cf8" letter-spacing="2">CORE BINARY ENGINE</text>
+    <text x="0" y="10" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="18" font-weight="800" fill="#ffffff">bsentinel CLI &amp; Library</text>
+    <text x="0" y="32" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5" font-weight="500" fill="#cbd5e1">100% Safe Rust · Zeroize · JSON Output</text>
+  </g>
+
+  <g transform="translate(210, 150)" filter="url(#cardShadow)">
+    <rect x="-175" y="-60" width="350" height="120" rx="12" fill="url(#cardGrad)" stroke="#0ea5e9" stroke-width="1.5"/>
+    <circle cx="-140" cy="-25" r="14" fill="#0369a1"/>
+    <text x="-140" y="-20" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="800" fill="#fff">01</text>
+    <text x="-115" y="-20" font-family="sans-serif" font-size="15" font-weight="700" fill="#38bdf8">Статический парсер PE32/PE32+</text>
+    <text x="-140" y="3" font-family="sans-serif" font-size="11.5" font-weight="600" fill="#e2e8f0">src/pe.rs</text>
+    <text x="-135" y="22" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">Парсинг заголовков DOS/COFF/Optional</text>
+    <text x="-135" y="38" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">с проверкой границ, анализ флагов ASLR/DEP/CFG и секций RWX</text>
+  </g>
+
+  <g transform="translate(1030, 150)" filter="url(#cardShadow)">
+    <rect x="-175" y="-60" width="350" height="120" rx="12" fill="url(#cardGrad)" stroke="#8b5cf6" stroke-width="1.5"/>
+    <circle cx="-140" cy="-25" r="14" fill="#6d28d9"/>
+    <text x="-140" y="-20" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="800" fill="#fff">04</text>
+    <text x="-115" y="-20" font-family="sans-serif" font-size="15" font-weight="700" fill="#c084fc">Декларативный байтовый патчер</text>
+    <text x="-140" y="3" font-family="sans-serif" font-size="11.5" font-weight="600" fill="#e2e8f0">src/patch.rs</text>
+    <text x="-135" y="22" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">Константно-временная сверка</text>
+    <text x="-135" y="38" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">ожидаемых байтов, SHA-256 до/после патча, резервная копия .bak и Zeroize</text>
+  </g>
+
+  <g transform="translate(210, 440)" filter="url(#cardShadow)">
+    <rect x="-175" y="-60" width="350" height="120" rx="12" fill="url(#cardGrad)" stroke="#10b981" stroke-width="1.5"/>
+    <circle cx="-140" cy="-25" r="14" fill="#047857"/>
+    <text x="-140" y="-20" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="800" fill="#fff">02</text>
+    <text x="-115" y="-20" font-family="sans-serif" font-size="15" font-weight="700" fill="#34d399">Энтропия и эвристика упаковщиков</text>
+    <text x="-140" y="3" font-family="sans-serif" font-size="11.5" font-weight="600" fill="#e2e8f0">src/entropy.rs</text>
+    <text x="-135" y="22" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">Энтропия Шеннона (0..8 бит/байт),</text>
+    <text x="-135" y="38" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">критерий Хи-квадрат и обнаружение UPX/VMProtect/Themida</text>
+  </g>
+
+  <g transform="translate(620, 485)" filter="url(#cardShadow)">
+    <rect x="-175" y="-60" width="350" height="120" rx="12" fill="url(#cardGrad)" stroke="#f59e0b" stroke-width="1.5"/>
+    <circle cx="-140" cy="-25" r="14" fill="#b45309"/>
+    <text x="-140" y="-20" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="800" fill="#fff">03</text>
+    <text x="-115" y="-20" font-family="sans-serif" font-size="15" font-weight="700" fill="#fbbf24">Сканер строк и индикаторов IoC</text>
+    <text x="-140" y="3" font-family="sans-serif" font-size="11.5" font-weight="600" fill="#e2e8f0">src/strings.rs</text>
+    <text x="-135" y="22" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">Извлечение строк ASCII и UTF-16LE с</text>
+    <text x="-135" y="38" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">классификацией URL, IPv4, ключей реестра и вызовов Win32 API</text>
+  </g>
+
+  <g transform="translate(1030, 440)" filter="url(#cardShadow)">
+    <rect x="-175" y="-60" width="350" height="120" rx="12" fill="url(#cardGrad)" stroke="#ec4899" stroke-width="1.5"/>
+    <circle cx="-140" cy="-25" r="14" fill="#be185d"/>
+    <text x="-140" y="-20" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="800" fill="#fff">05</text>
+    <text x="-115" y="-20" font-family="sans-serif" font-size="15" font-weight="700" fill="#f472b6">Структурированный CLI и JSON</text>
+    <text x="-140" y="3" font-family="sans-serif" font-size="11.5" font-weight="600" fill="#e2e8f0">src/cli.rs</text>
+    <text x="-135" y="22" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">Детерминированный генератор тестовых</text>
+    <text x="-135" y="38" font-family="sans-serif" font-size="10" font-weight="400" fill="#94a3b8">PE64 (synth-pe) и машиночитаемый режим --json</text>
+  </g>
+
+  <g stroke="#475569" stroke-width="2" stroke-dasharray="4 4" opacity="0.6">
+    <path d="M 385 150 L 445 205"/>
+    <path d="M 855 150 L 795 205"/>
+    <path d="M 385 440 L 445 205"/>
+    <path d="M 620 425 L 620 260"/>
+    <path d="M 855 440 L 795 205"/>
+  </g>
+</svg>
