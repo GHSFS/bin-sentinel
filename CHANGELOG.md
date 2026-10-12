@@ -5,6 +5,26 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-10-13
+
+### Added
+- Zero-dependency Linux and BSD ELF64 binary parser (`src/elf/`):
+  - Strict validation of 64-bit ELF identification magic (`\x7FELF`), architecture class, and byte order.
+  - Complete parsing of ELF executable header (`Ehdr`), program header segments (`Phdr`), and section tables (`Shdr`).
+  - Automated security mitigation evaluation:
+    - Position-Independent Executable (`PIE`) detection from `ET_DYN` object types and dynamic flags.
+    - Relocation Read-Only (`RELRO`) classification into Full, Partial, or None via `PT_GNU_RELRO` and `BIND_NOW` flags.
+    - Non-executable stack (`NX`) verification via `PT_GNU_STACK` permission flags.
+    - Stack canary detection via symbol table inspection for `__stack_chk_fail` and related protection symbols.
+  - Per-section Shannon entropy calculation and detection of writable-and-executable (`RWX`) segments.
+  - Dynamic tag array reader for library dependencies (`DT_NEEDED`), runtime search paths (`DT_RPATH`, `DT_RUNPATH`), and sonames (`DT_SONAME`).
+  - Symbol table parser extracting function, object, and global/weak symbol definitions from `.dynsym` and `.symtab`.
+  - Deterministic synthetic ELF64 sample binary builder (`build_synthetic_elf64`).
+- CLI subcommands:
+  - `bsentinel inspect-elf <file> [--json]`: human-readable and structured JSON inspection of ELF64 binaries.
+  - `bsentinel synth-elf <output>`: generates valid synthetic ELF64 test binaries for validation pipelines.
+- Modular integration test suite in `tests/elf_test.rs`.
+
 ## [0.1.0] - 2026-10-13
 
 ### Added

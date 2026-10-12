@@ -75,15 +75,20 @@ bsentinel synth-pe sample.exe
 bsentinel inspect sample.exe
 bsentinel inspect sample.exe --json
 
-# 4. Run statistical Shannon entropy & Chi-square uniformity analysis
+# 4. Generate and inspect a deterministic synthetic Linux/BSD ELF64 binary
+bsentinel synth-elf sample.elf
+bsentinel inspect-elf sample.elf
+bsentinel inspect-elf sample.elf --json
+
+# 5. Run statistical Shannon entropy & Chi-square uniformity analysis
 bsentinel entropy sample.exe --window 512
 bsentinel entropy sample.exe --window 512 --json
 
-# 5. Extract printable ASCII & UTF-16LE strings and filter Indicators of Compromise (IoCs)
+# 6. Extract printable ASCII & UTF-16LE strings and filter Indicators of Compromise (IoCs)
 bsentinel strings sample.exe --min-len 4
 bsentinel strings sample.exe --ioc-only --json
 
-# 6. Apply a verified declarative byte patch with expected-byte check and .bak backup
+# 7. Apply a verified declarative byte patch with expected-byte check and .bak backup
 bsentinel patch sample.exe --offset 0x200 --expect 4883EC28 --replace 90909090 --backup --json
 ```
 
@@ -109,15 +114,17 @@ bin-sentinel/
 ├── src/
 │   ├── lib.rs                     # Library module exports
 │   ├── main.rs                    # CLI entry point & human/JSON output formatting
-│   ├── cli.rs                     # Clap derive subcommands (inspect, entropy, strings, patch, synth-pe)
+│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, entropy, strings, patch, synth-pe, synth-elf)
 │   ├── error.rs                   # Unified SentinelError & Result<T>
 │   ├── pe.rs                      # Zero-dependency PE32/PE32+ header & section parser + synthetic PE64 builder
+│   ├── elf/                       # Zero-dependency Linux/BSD ELF64 parser (headers, mod, synthetic builder)
 │   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
 │   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
 │   └── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
 ├── tests/
 │   ├── pe_entropy_test.rs         # Integration tests for PE64 parsing, mitigations, entropy & CLI JSON
-│   └── patch_strings_test.rs      # Integration tests for IoC extraction, verified patching & backups
+│   ├── patch_strings_test.rs      # Integration tests for IoC extraction, verified patching & backups
+│   └── elf_test.rs                # Integration tests for ELF64 parsing, PIE/RELRO/NX mitigations & dynamic symbols
 └── docs/
     ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
     └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams

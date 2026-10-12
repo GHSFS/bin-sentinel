@@ -8,6 +8,7 @@ use std::process;
 use clap::Parser;
 
 use bin_sentinel::cli::{Cli, Commands};
+use bin_sentinel::elf::{build_synthetic_elf64, parse_elf, SHF_ALLOC, SHF_EXECINSTR, SHT_PROGBITS};
 use bin_sentinel::entropy::analyze_entropy_windows;
 use bin_sentinel::error::Result;
 use bin_sentinel::patch::{apply_patch, parse_hex_bytes, parse_offset};
@@ -187,6 +188,111 @@ fn run() -> Result<()> {
                 "Generated synthetic PE32+ (64-bit) binary at {} ({} bytes)",
                 output.display(),
                 pe_bytes.len()
+            );
+        }
+        Commands::InspectElf { file, json } => {
+            let data = fs::read(&file)?;
+            let info = parse_elf(&data)?;
+            if json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&info).unwrap_or_default()
+                );
+            } else {
+                println!("=== ELF64 Static Inspection: {} ===", file.display());
+                println!("Class             : {}", info.class);
+                println!("Endianness        : {}", info.endianness);
+                println!("OS/ABI            : {}", info.os_abi);
+                println!(
+                    "Type              : 0x{:04X} ({})",
+                    info.type_raw, info.elf_type
+                );
+                println!(
+                    "Machine           : 0x{:04X} ({})",
+                    info.machine_raw, info.machine
+                );
+                println!("Entry Point       : 0x{:016X}", info.entry_point);
+                println!("Overall Entropy   : {:.4} bits/byte", info.overall_entropy);
+                println!(
+                    "Mitigations       : PIE={} | RELRO={:?} | NX={} | Canary={}",
+                    info.mitigations.pie,
+                    info.mitigations.relro,
+                    info.mitigations.nx,
+                    info.mitigations.stack_canary
+                );
+                println!("\n[Program Headers (Segments)]");
+                for ph in &info.program_headers {
+                    println!(
+                        "  {:16} | {} | Off 0x{:08X} | VAddr 0x{:016X} | FileSz {:6} B | MemSz {:6} B",
+                        ph.segment_type, ph.flags, ph.offset, ph.vaddr, ph.filesz, ph.memsz
+                    );
+                }
+                println!("\n[Section Headers]");
+                for sec in &info.sections {
+                    println!(
+                        "  {:12} | {:12} | {:5} | Addr 0x{:016X} | Off 0x{:08X} ({:6} B) | H={:.4}{}",
+                        sec.name,
+                        sec.section_type,
+                        sec.flags,
+                        sec.addr,
+                        sec.offset,
+                        sec.size,
+                        sec.entropy,
+                        if sec.rwx_anomaly {
+                            " [RWX ANOMALY]"
+                        } else {
+                            ""
+                        }
+                    );
+                }
+                if !info.dynamic_tags.is_empty() {
+                    println!("\n[Dynamic Tags]");
+                    for dyn_entry in &info.dynamic_tags {
+                        let extra = match &dyn_entry.parsed_string {
+                            Some(s) => format!(" ({s})"),
+                            None => String::new(),
+                        };
+                        println!(
+                            "  {:16} (0x{:X}) -> 0x{:016X}{extra}",
+                            dyn_entry.tag_name, dyn_entry.tag, dyn_entry.val
+                        );
+                    }
+                }
+                if !info.symbols.is_empty() {
+                    println!("\n[Symbols]");
+                    for sym in &info.symbols {
+                        println!(
+                            "  {:24} | {:6} | {:6} | 0x{:016X} ({:4} B)",
+                            sym.name, sym.binding, sym.symbol_type, sym.value, sym.size
+                        );
+                    }
+                }
+                if !info.alerts.is_empty() {
+                    println!("\n[Security & Heuristic Alerts]");
+                    for alert in &info.alerts {
+                        println!("  ! {alert}");
+                    }
+                }
+            }
+        }
+        Commands::SynthElf { output } => {
+            let code_bytes = b"\x48\x31\xC0\x48\xFF\xC0\xC3"; // xor rax, rax; inc rax; ret
+            let rodata_bytes = b"Hello from synthetic ELF64\0";
+            let custom_sections = [
+                (
+                    ".text",
+                    &code_bytes[..],
+                    SHF_ALLOC | SHF_EXECINSTR,
+                    SHT_PROGBITS,
+                ),
+                (".rodata", &rodata_bytes[..], SHF_ALLOC, SHT_PROGBITS),
+            ];
+            let elf_bytes = build_synthetic_elf64(&custom_sections);
+            fs::write(&output, &elf_bytes)?;
+            println!(
+                "Generated synthetic ELF64 binary at {} ({} bytes)",
+                output.display(),
+                elf_bytes.len()
             );
         }
     }

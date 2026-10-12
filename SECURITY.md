@@ -11,8 +11,8 @@ Security updates are applied to the latest release series on the `main` branch.
 
 ## Binary Parsing & Memory Safety Invariants
 
-1. **Zero `unsafe` Code**: All PE32/PE32+ and binary structure parsers are implemented in 100% safe Rust using checked slice indexing and saturating/checked integer arithmetic.
-2. **Untrusted Binary Bounds Protection**: Malformed `e_lfanew` offsets, truncated COFF/Optional headers, overlapping section tables, and out-of-bounds raw data pointers are rejected deterministically without panicking or over-allocating memory.
+1. **Zero `unsafe` Code**: All PE32/PE32+ and Linux/BSD ELF64 binary structure parsers are implemented in 100% safe Rust using checked slice indexing and saturating/checked integer arithmetic.
+2. **Untrusted Binary Bounds Protection**: Malformed `e_lfanew`, `e_phoff`, `e_shoff` offsets, truncated headers, overlapping section tables, and out-of-bounds raw data pointers are rejected deterministically without panicking or over-allocating memory.
 3. **Constant-Time Patch Verification**: Declarative byte patches validate expected target bytes using branchless constant-time comparison (`constant_time_eq`) and compute pre-patch/post-patch SHA-256 digests prior to atomic file replacement.
 4. **Sensitive Buffer Zeroization**: Intermediate binary patch buffers are scrubbed from memory on drop via `zeroize`.
 

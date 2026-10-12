@@ -78,4 +78,17 @@ pub enum Commands {
         /// Output path for the synthetic PE64 executable.
         output: PathBuf,
     },
+    /// Inspect Linux/BSD ELF64 headers, security mitigations (PIE/RELRO/NX/Canary), dynamic tags, and symbol tables.
+    InspectElf {
+        /// Target ELF binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Generate a deterministic synthetic ELF64 sample binary for forensic testing.
+    SynthElf {
+        /// Output path for the synthetic ELF64 executable.
+        output: PathBuf,
+    },
 }

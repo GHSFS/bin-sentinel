@@ -3,6 +3,7 @@
 // Copyright 2026 GHSFS. See the NOTICE file for attribution details.
 
 pub mod cli;
+pub mod elf;
 pub mod entropy;
 pub mod error;
 pub mod patch;
