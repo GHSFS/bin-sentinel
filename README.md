@@ -1,9 +1,9 @@
 <div align="center">
 
-**🇺🇸 English** · [🇰🇷 한국어](./docs/locales/ko.md) · [🇨🇳 中文](./docs/locales/zh-CN.md) · [🇪🇸 Español](./docs/locales/es.md) · [🇮🇳 हिन्दी](./docs/locales/hi.md) · [🇸🇦 العربية](./docs/locales/ar.md) · [🇧🇷 Português](./docs/locales/pt-BR.md) · [🇷🇺 Русский](./docs/locales/ru.md) · [🇫🇷 Français](./docs/locales/fr.md) · [🇮🇩 Bahasa Indonesia](./docs/locales/id.md)
-
-</div>
-<br>
+<p align="center">
+  <strong>🇺🇸 English</strong> · <a href="./docs/locales/ko.md">🇰🇷 한국어</a> · <a href="./docs/locales/zh-CN.md">🇨🇳 中文</a> · <a href="./docs/locales/es.md">🇪🇸 Español</a> · <a href="./docs/locales/hi.md">🇮🇳 हिन्दी</a><br />
+  <a href="./docs/locales/ar.md">🇸🇦 العربية</a> · <a href="./docs/locales/pt-BR.md">🇧🇷 Português</a> · <a href="./docs/locales/ru.md">🇷🇺 Русский</a> · <a href="./docs/locales/fr.md">🇫🇷 Français</a> · <a href="./docs/locales/id.md">🇮🇩 Bahasa Indonesia</a>
+</p>
 
 <p align="center">
   <img src="./docs/assets/locales/en/banner.svg" alt="BinSentinel (bsentinel) banner" width="100%" />
