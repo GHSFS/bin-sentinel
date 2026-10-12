@@ -5,6 +5,28 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-13
+
+### Added
+- Embedded cryptographic constant, S-Box, and lookup table scanner (`src/crypto_scan/`):
+  - Static byte-signature matching for common block ciphers, stream ciphers, hash functions, and cyclic redundancy checks:
+    - AES-128/192/256 (Rijndael) forward substitution box (`AES_FORWARD_SBOX`, 256 bytes) and inverse substitution box (`AES_INVERSE_SBOX`, 256 bytes).
+    - AES key expansion round constants (`AES_RCON`, 10 bytes).
+    - ChaCha20 and Salsa20 state expansion constants (`"expand 32-byte k"` and `"expand 16-byte k"`).
+    - SHA-256 initial state vectors (`H0..H7` in Little-Endian and Big-Endian) and first 16 round constants (`K[0..15]`).
+    - SHA-512 initial state vectors (`H0..H7` in Little-Endian and Big-Endian) and round constants.
+    - MD5 state vectors (`A, B, C, D` in Little-Endian and Big-Endian).
+    - SHA-1 state vectors (`H0..H4` in Little-Endian and Big-Endian).
+    - IEEE 802.3 CRC-32 standard precomputed lookup table (first 16 entries in Little-Endian).
+    - TEA and XTEA golden ratio delta constant (`0x9E3779B9`) in Little-Endian and Big-Endian byte sequences with occurrence tracking.
+    - SM4 commercial block cipher substitution box (`SM4_SBOX`, 256 bytes).
+  - Automated executable section and RVA correlation:
+    - Cross-references file offsets against PE section tables (`PeInfo`) to resolve containing sections and RVAs.
+    - Cross-references file offsets against ELF section headers (`ElfInfo`) to resolve containing sections and virtual memory addresses.
+- CLI subcommand:
+  - `bsentinel crypto-scan <file> [--json]`: human-readable and structured JSON output for automated forensics workflows.
+- Integration test suite in `tests/crypto_scan_test.rs`.
+
 ## [0.2.0] - 2026-10-13
 
 ### Added

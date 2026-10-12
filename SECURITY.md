@@ -15,6 +15,7 @@ Security updates are applied to the latest release series on the `main` branch.
 2. **Untrusted Binary Bounds Protection**: Malformed `e_lfanew`, `e_phoff`, `e_shoff` offsets, truncated headers, overlapping section tables, and out-of-bounds raw data pointers are rejected deterministically without panicking or over-allocating memory.
 3. **Constant-Time Patch Verification**: Declarative byte patches validate expected target bytes using branchless constant-time comparison (`constant_time_eq`) and compute pre-patch/post-patch SHA-256 digests prior to atomic file replacement.
 4. **Sensitive Buffer Zeroization**: Intermediate binary patch buffers are scrubbed from memory on drop via `zeroize`.
+5. **Bounded Linear Scanning & Deterministic Memory Consumption**: Cryptographic constant and S-Box scanning operates strictly over bounded byte slices with linear byte matching, preventing unbounded recursion or denial-of-service on large untrusted binaries.
 
 ## Reporting a Vulnerability
 

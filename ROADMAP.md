@@ -11,13 +11,13 @@ This document tracks shipped capabilities and planned binary analysis, reverse-e
 - [x] **Statistical Entropy & Packer Heuristic Analyzer (`src/entropy.rs`)** — Full-file and sliding-window Shannon entropy ($0.0..=8.0$ bits/byte), Chi-square ($\chi^2$) uniformity testing, byte class ratios, and heuristic detection for UPX, VMProtect, Themida, and compressed/encrypted code sections (`bsentinel entropy`).
 - [x] **Static ASCII / UTF-16LE String & IoC Extractor (`src/strings.rs`)** — Offset-indexed ASCII and UTF-16LE wide string extraction with automated classification of URLs, IPv4 addresses, Windows Registry persistence keys, and sensitive Win32 process injection/anti-debug APIs (`bsentinel strings`).
 - [x] **Verified Declarative Byte-Patching Engine (`src/patch.rs`)** — Constant-time expected-byte verification, pre/post SHA-256 integrity digests, optional `.bak` backup creation, and `zeroize` buffer scrubbing (`bsentinel patch`).
+- [x] **Cryptographic Constant & S-Box Scanner (`src/crypto_scan/`)** — Detect embedded cryptographic primitives, AES/Rijndael forward/inverse S-Boxes and Rcon, ChaCha20/Salsa20 sigma/tau magic constants, SHA-256/SHA-512 initial states and round constants, MD5/SHA-1 states, CRC-32 standard lookup tables, TEA/XTEA golden-ratio delta `0x9E3779B9`, and SM4 cipher S-Box with automated PE and ELF section and RVA resolution (`bsentinel crypto-scan`).
 
 ---
 
 ## Planned Milestones
 
 ### Phase 1: Cross-Platform Executable Formats & Cryptographic Forensics
-- [ ] **Cryptographic Constant & S-Box Scanner (`src/crypto_scan.rs`)** — Detect embedded cryptographic tables and constants in compiled binaries, including AES/Rijndael S-Boxes, ChaCha20/Salsa20 `"expand 32-byte k"` state constants, SHA-256/SHA-512 round constants, CRC32 lookup tables, and RSA public exponents (`bsentinel crypto-scan`).
 - [ ] **PE Import/Export Table (IAT/EAT) & API Hash Resolver (`src/imports.rs`)** — Parse PE Data Directories for Import and Export tables, compute Import Hash (`imphash`), and resolve common shellcode/malware API hashes (`ROR13`, `CRC32`, `DJB2`, `FNV-1a`) against standard Windows DLL export names (`bsentinel imports`).
 - [ ] **x86_64 Prologue/Epilogue & Control-Flow Pattern Scanner (`src/disasm.rs`)** — Lightweight instruction boundary scanner identifying function prologues, `SYSCALL`/`INT 2E` direct system call stubs, `RDTSC` timing checks, `CPUID` hypervisor checks, and indirect call gadgets (`bsentinel scan-code`).
 - [ ] **YARA-Style Hex & Wildcard Pattern Rule Scanner (`src/rules.rs`)** — Fast declarative byte-signature matcher supporting nibble wildcards (`48 8B ?? ?? E8`), relative jump ranges, and boolean rule expressions (`bsentinel rule-scan`).

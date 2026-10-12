@@ -8,6 +8,7 @@ use std::process;
 use clap::Parser;
 
 use bin_sentinel::cli::{Cli, Commands};
+use bin_sentinel::crypto_scan::scan_crypto_file;
 use bin_sentinel::elf::{build_synthetic_elf64, parse_elf, SHF_ALLOC, SHF_EXECINSTR, SHT_PROGBITS};
 use bin_sentinel::entropy::analyze_entropy_windows;
 use bin_sentinel::error::Result;
@@ -294,6 +295,51 @@ fn run() -> Result<()> {
                 output.display(),
                 elf_bytes.len()
             );
+        }
+        Commands::CryptoScan { file, json } => {
+            let report = scan_crypto_file(&file)?;
+            if json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&report).unwrap_or_default()
+                );
+            } else {
+                println!(
+                    "=== Cryptographic Primitive & S-Box Scan: {} ===",
+                    file.display()
+                );
+                println!("File Size         : {} bytes", report.file_size);
+                println!("Detected Format   : {}", report.binary_format);
+                println!("Total Matches     : {}", report.total_matches);
+                if report.tea_delta_occurrences > 0 {
+                    println!(
+                        "TEA Delta Hits    : {} occurrences",
+                        report.tea_delta_occurrences
+                    );
+                }
+                if !report.detected_algorithms.is_empty() {
+                    println!(
+                        "Algorithms Found  : {}",
+                        report.detected_algorithms.join(", ")
+                    );
+                }
+                println!("\n[Detected Cryptographic Primitives]");
+                if report.matches.is_empty() {
+                    println!("  (No known cryptographic constants or S-Boxes detected)");
+                } else {
+                    for m in &report.matches {
+                        let sec_str = match (&m.section_name, m.relative_virtual_address) {
+                            (Some(sec), Some(rva)) => format!(" [{sec} | RVA 0x{rva:08X}]"),
+                            (Some(sec), None) => format!(" [{sec}]"),
+                            _ => String::new(),
+                        };
+                        println!(
+                            "  0x{:08X} | {:26} | {:24} | {:6} | {}{sec_str}",
+                            m.offset, m.name, m.algorithm, m.confidence, m.description
+                        );
+                    }
+                }
+            }
         }
     }
 

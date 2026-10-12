@@ -91,4 +91,12 @@ pub enum Commands {
         /// Output path for the synthetic ELF64 executable.
         output: PathBuf,
     },
+    /// Scan binary files for embedded cryptographic constants, S-Boxes, round keys, and lookup tables.
+    CryptoScan {
+        /// Target binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }
