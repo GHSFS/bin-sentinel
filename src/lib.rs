@@ -15,5 +15,6 @@ pub mod imports;
 pub mod macho;
 pub mod patch;
 pub mod pe;
+pub mod rich;
 pub mod rules;
 pub mod strings;

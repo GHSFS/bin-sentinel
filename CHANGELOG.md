@@ -5,6 +5,31 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-10-13
+
+### Added
+- PE Rich Header forensic decoder, compiler toolchain fingerprinter, and checksum validator (`src/rich/`):
+  - Zero-dependency PE Rich header locator and parser (`parser.rs`):
+    - Linear scan locating the `"Rich"` magic marker (`0x68636952`) within the DOS stub area bounded by `e_lfanew`.
+    - XOR decryption using the 32-bit checksum key stored immediately after `"Rich"`.
+    - Reverse search locating the `"DanS"` entry marker (`0x536E6144`) and verifying triple 32-bit zero-padding invariants.
+    - Decryption of `@comp.id` records extracting 16-bit Product IDs, 16-bit build numbers, and 32-bit invocation counts.
+  - Microsoft toolchain dictionary and Visual Studio fingerprinter (`database.rs`):
+    - Comprehensive product ID lookup table resolving C compilers (`Utc*_C`), C++ compilers (`Utc*_CPP`), Linkers (`Linker*`), Resource compilers (`Cvtres*`), Macro Assemblers (`Masm*`), and Import/Export modules.
+    - Automated mapping of build numbers and tool IDs to Visual Studio suite targets (VS 97 through VS 2022).
+    - Overall primary toolchain detection summarizing dominant compiler suites.
+  - Authentic 32-bit `ROL` checksum computation and verification (`parser.rs`):
+    - Implementation of Microsoft's authentic checksum algorithm iterating across DOS header bytes (with `e_lfanew` cleared) and `@comp.id` records via 32-bit `rotate_left`.
+    - Immediate detection and reporting of checksum tampering or synthetic watermark forgery.
+  - Clear data cryptographic hashing (`types.rs`):
+    - RFC 1321 MD5 hash of decrypted clear data matching standard VirusTotal / threat intelligence `rich_pe_header_hash`.
+    - High-assurance SHA-256 hash of clear data for reproducible binary triage.
+  - Deterministic synthetic Rich PE image builder (`synthetic.rs`):
+    - `build_synthetic_rich_pe` generating compliant PE64 binaries with authentic or intentionally corrupted Rich headers for automated test pipelines.
+  - CLI subcommand:
+    - `bsentinel rich <file> [--json]`: formatted terminal table reporting header location, primary toolset, XOR key, checksum validity, clear data hashes, and individual compilation records, with optional structured JSON output.
+  - Comprehensive integration test suite (`tests/rich_test.rs`) covering synthetic PE parsing, checksum verification, tamper detection, Visual Studio version identification, corrupted header resilience, and end-to-end CLI JSON and table verification.
+
 ## [0.9.0] - 2026-10-13
 
 ### Added

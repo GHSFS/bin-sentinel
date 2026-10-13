@@ -188,4 +188,12 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Decode PE Rich header, compiler toolchain @comp.id product IDs, and verify 32-bit checksum.
+    Rich {
+        /// Target PE binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }

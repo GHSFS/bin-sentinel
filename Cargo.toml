@@ -4,7 +4,7 @@
 
 [package]
 name = "bin-sentinel"
-version = "0.9.0"
+version = "0.10.0"
 edition = "2021"
 rust-version = "1.75"
 description = "Zero-dependency binary forensics, PE/ELF static analyzer, packer entropy detector, and declarative byte-patching toolkit in pure Rust."
