@@ -6,6 +6,7 @@ use std::fs;
 use std::path::Path;
 
 use crate::crypto_scan::scan_crypto_file;
+use crate::deobfuscate::scan_deobfuscate_file;
 use crate::disasm::scan_code_file;
 use crate::error::Result;
 use crate::imports::inspect_imports;
@@ -177,6 +178,42 @@ pub fn handle_scan_code(file: &Path, json: bool) -> Result<()> {
                 println!(
                     "  {:16} | {:7} | {:18} | {:24} | {}{}",
                     rva_str, sec_str, m.category, m.mnemonic, m.bytes_hex, alert_str
+                );
+            }
+        }
+    }
+    Ok(())
+}
+
+pub fn handle_xor_scan(file: &Path, json: bool) -> Result<()> {
+    let report = scan_deobfuscate_file(file)?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).unwrap_or_default()
+        );
+    } else {
+        println!("=== Deobfuscation Scan: {} ===", file.display());
+        println!("Format            : {}", report.binary_format);
+        println!("File Size         : {} bytes", report.file_size);
+        println!("Artifacts Found   : {}", report.total_matches);
+        println!(
+            "Methods Applied   : {}",
+            report.scan_methods_applied.join(", ")
+        );
+
+        if !report.artifacts.is_empty() {
+            println!("\n[Identified Deobfuscated Artifacts]");
+            for a in &report.artifacts {
+                let sec_str = a.section_name.as_deref().unwrap_or("-");
+                let rva_str = if let Some(rva) = a.relative_virtual_address {
+                    format!("RVA 0x{rva:08X}")
+                } else {
+                    format!("Offset 0x{:08X}", a.offset)
+                };
+                println!(
+                    "  {:16} | {:7} | {:16} | {:14} | Conf {:.2} | {}",
+                    rva_str, sec_str, a.method, a.kind, a.confidence, a.content
                 );
             }
         }

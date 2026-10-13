@@ -196,4 +196,12 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Brute-force XOR, ADD, and ROL deobfuscation to uncover hidden URLs, IPv4 addresses, Registry keys, and PE headers.
+    XorScan {
+        /// Target binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }

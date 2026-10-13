@@ -119,6 +119,10 @@ bsentinel apply-recipe baseline.exe patch.json --reverse
 # 14. Decode PE Rich header, fingerprint Visual Studio toolchains & verify 32-bit checksum
 bsentinel rich sample.exe
 bsentinel rich sample.exe --json
+
+# 15. Brute-force single/multi-byte XOR, ADD & ROL deobfuscation to uncover hidden IoCs and headers
+bsentinel xor-scan sample.exe
+bsentinel xor-scan sample.exe --json
 ```
 
 </details>
@@ -143,7 +147,7 @@ bin-sentinel/
 ├── src/
 │   ├── lib.rs                     # Library module exports
 │   ├── main.rs                    # Streamlined CLI entry point dispatching to commands
-│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, scan-code, rule-scan, rich, etc.)
+│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, scan-code, rule-scan, rich, xor-scan, etc.)
 │   ├── commands/                  # Modular CLI subcommands (inspect, forensics, rules, diff, authenticode, macho, rich)
 │   ├── error.rs                   # Unified SentinelError & Result<T>
 │   ├── pe.rs                      # Zero-dependency PE32/PE32+ header & section parser + synthetic PE64 builder
@@ -153,6 +157,7 @@ bin-sentinel/
 │   ├── disasm/                    # x86_64 prologue/epilogue, direct syscalls & control-flow pattern scanner
 │   ├── rules/                     # Declarative YARA-style hex signature, nibble wildcard & byte jump scanner
 │   ├── rich/                      # PE Rich header decoder, MSVC compiler toolchain fingerprinter & checksum validator
+│   ├── deobfuscate/               # Single/multi-byte XOR, ADD & ROL deobfuscation scanner & key recovery
 │   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
 │   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
 │   ├── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
@@ -166,7 +171,8 @@ bin-sentinel/
 │   ├── disasm_test.rs             # Integration tests for x86_64 prologues, direct syscalls & anti-debug checks
 │   ├── rules_test.rs              # Integration tests for YARA-style hex wildcards, jumps, strings & JSON rule sets
 │   ├── diff_test.rs               # Integration tests for structural diffing, patch recipes & atomic reversal
-│   └── rich_test.rs               # Integration tests for PE Rich header decoding, toolchain fingerprinting & checksums
+│   ├── rich_test.rs               # Integration tests for PE Rich header decoding, toolchain fingerprinting & checksums
+│   └── deobfuscate_test.rs        # Integration tests for XOR/ADD/ROL deobfuscation, crib dragging & payload classifiers
 └── docs/
     ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
     └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams
