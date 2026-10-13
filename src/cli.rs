@@ -91,6 +91,22 @@ pub enum Commands {
         /// Output path for the synthetic ELF64 executable.
         output: PathBuf,
     },
+    /// Inspect macOS/iOS Mach-O 64-bit and Universal (Fat) binary headers, segments, sections, and mitigations.
+    InspectMacho {
+        /// Target Mach-O binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Generate a deterministic synthetic Mach-O sample binary (64-bit or Universal) for forensic testing.
+    SynthMacho {
+        /// Output path for the synthetic Mach-O executable.
+        output: PathBuf,
+        /// Generate a Universal (Fat) binary containing both x86_64 and ARM64 slices.
+        #[arg(long)]
+        universal: bool,
+    },
     /// Scan binary files for embedded cryptographic constants, S-Boxes, round keys, and lookup tables.
     CryptoScan {
         /// Target binary file path.

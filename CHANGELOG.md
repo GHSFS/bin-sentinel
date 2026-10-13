@@ -5,6 +5,31 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-10-13
+
+### Added
+- Zero-dependency macOS/iOS Mach-O binary forensics engine (`src/macho/`):
+  - Architecture and container support:
+    - 64-bit Mach-O headers (`0xFEEDFACF` / `MH_MAGIC_64` and byte-swapped `MH_CIGAM_64`).
+    - Universal Fat multi-architecture container parser (`0xCAFEBABE` / `FAT_MAGIC` and `FAT_CIGAM`) unpacking `fat_arch` descriptors and isolating nested 64-bit slices (ARM64, x86_64).
+  - Load command analysis:
+    - `LC_SEGMENT_64`: 64-bit memory segments (`__PAGEZERO`, `__TEXT`, `__DATA`, `__LINKEDIT`), memory protections (`maxprot`, `initprot`), embedded `section_64` tables, and per-section Shannon entropy profiling.
+    - `LC_MAIN`: application entry point file offset and stack size configuration.
+    - `LC_LOAD_DYLIB`: linked dynamic libraries and framework path dependencies.
+    - `LC_CODE_SIGNATURE`: digital signature data offset and superblob payload size.
+  - Security hardening and anomaly detection:
+    - Position-Independent Executable (`PIE`) flag verification (`MH_PIE`).
+    - Non-executable stack detection (`MH_ALLOW_STACK_EXECUTION` audit).
+    - Apple digital code signature presence verification (`LC_CODE_SIGNATURE`).
+    - Writable & Executable (`RWX`) segment permission anomaly alerts.
+    - High-entropy and packed code section heuristic detection.
+  - Deterministic synthetic Mach-O generator (`synthetic.rs`):
+    - `build_synthetic_macho64` and `build_synthetic_macho_universal` generating structurally valid 64-bit and Universal dual-architecture test binaries with 4KB page alignment.
+- CLI subcommands:
+  - `bsentinel inspect-macho <file> [--json]`: forensic telemetry reporting architecture slices, load commands, sections, linked libraries, and security mitigations in human-readable table or JSON format.
+  - `bsentinel synth-macho <output> [--universal]`: generate deterministic 64-bit Mach-O or Universal Fat test samples for automated pipelines.
+- Modular integration test suite in `tests/macho_test.rs` covering header validation, load command parsing, multi-slice Fat containers, RWX anomaly alerting, and CLI table/JSON validation.
+
 ## [0.6.0] - 2026-10-13
 
 ### Added

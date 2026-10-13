@@ -4,6 +4,7 @@
 
 pub mod forensics;
 pub mod inspect;
+pub mod macho;
 pub mod rules;
 
 use crate::cli::Commands;
@@ -31,6 +32,8 @@ pub fn dispatch(command: Commands) -> Result<()> {
         Commands::SynthPe { output } => inspect::handle_synth_pe(&output),
         Commands::InspectElf { file, json } => inspect::handle_inspect_elf(&file, json),
         Commands::SynthElf { output } => inspect::handle_synth_elf(&output),
+        Commands::InspectMacho { file, json } => macho::handle_inspect_macho(&file, json),
+        Commands::SynthMacho { output, universal } => macho::handle_synth_macho(&output, universal),
         Commands::CryptoScan { file, json } => forensics::handle_crypto_scan(&file, json),
         Commands::Imports {
             file,
