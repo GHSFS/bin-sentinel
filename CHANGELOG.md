@@ -5,6 +5,43 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-10-13
+
+### Added
+- Pure-Rust x86_64 instruction pattern scanner and control-flow disassembler (`src/disasm/`):
+  - Direct system call stub detection (`rules_control.rs`):
+    - Windows NT direct syscall stubs (`4C 8B D1 B8 <ssn> 0F 05 [C3]`, e.g. SysWhispers / Hell's Gate / Halo's Gate patterns) extracting System Service Numbers (SSN).
+    - Linux direct syscall invocations (`B8 <sys_nr> 0F 05 [C3]`).
+    - Standalone 64-bit `SYSCALL` (`0F 05`) and legacy 32-bit `INT 0x80` (`CD 80`) software interrupts.
+  - Anti-analysis and anti-debugging timing probe detection:
+    - `RDTSC` (`0F 31`) and `RDTSCP` (`0F 01 F9`) cycle count probes used for latency threshold evasion and sleep-skipping checks.
+  - Hypervisor and virtual machine fingerprinting detection:
+    - `CPUID` (`0F A2`) processor information and hypervisor leaf queries.
+    - `SMSW` (`0F 01 F0` / `0F 01 E0`) machine status word queries.
+  - Software traps and breakpoint detection:
+    - `UD2` (`0F 0B`) compiler unreachable assertions and panic traps.
+    - `INT 3` (`0xCC`) software breakpoints (distinguishing single break traps from multi-byte compiler function alignment padding runs).
+    - `ICEBP` / `INT 1` (`0xF1`) single-step in-circuit emulator breakpoint traps.
+    - `INTO` (`0xCE`) overflow traps.
+  - Function prologue and stack frame setup detection (`rules_frame.rs`):
+    - Standard frame pointer prologues (`55 48 89 E5` / `55 48 8B EC` push rbp; mov rbp, rsp).
+    - Compound frame pointer setups with immediate stack allocation (`sub rsp, imm8/imm32`).
+    - Windows x64 ABI non-volatile register preservation and argument home spill sequences (`mov [rsp+8], rcx`, `mov [rsp+disp], rbx`, `push rbx; sub rsp, imm8`).
+    - Legacy 32-bit frame setup (`55 89 E5`).
+  - Function epilogue and stack teardown detection:
+    - Standard near returns (`C3`), returns with caller popping (`C2 <imm16>`).
+    - Frame teardown sequences (`48 89 EC 5D C3` mov rsp, rbp; pop rbp; ret, `leave; ret`, `pop rbp; ret`, `add rsp, imm; ret`).
+  - Indirect branches and control-flow pivots:
+    - `JMP RSP` (`FF E4`) stack pivot gadgets and shellcode bounce points.
+    - Indirect register jumps and calls (`FF E0` jmp rax, `FF D0` call rax, `FF D2` call rdx).
+    - RIP-relative indirect calls and jumps (`FF 25 <disp32>`, `FF 15 <disp32>`).
+  - Automated executable section and RVA correlation (`scanner.rs`):
+    - Resolves containing sections (`.text`, `.rdata`, etc.) and RVAs/virtual addresses for valid PE and ELF binaries.
+    - Flags security risk alerts when sensitive code sequences (direct syscalls, timing checks) are located inside anomalous RWX sections or outside executable segments.
+- CLI subcommand:
+  - `bsentinel scan-code <file> [--json]`: comprehensive x86_64 code pattern scan with structured telemetry and heuristic risk alerts.
+- Dedicated integration test suite in `tests/disasm_test.rs`.
+
 ## [0.4.0] - 2026-10-13
 
 ### Added

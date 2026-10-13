@@ -4,6 +4,7 @@
 
 pub mod cli;
 pub mod crypto_scan;
+pub mod disasm;
 pub mod elf;
 pub mod entropy;
 pub mod error;

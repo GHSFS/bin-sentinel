@@ -110,4 +110,12 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Scan executable code sections for x86_64 prologues, direct syscalls, and anti-debug patterns.
+    ScanCode {
+        /// Target binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }

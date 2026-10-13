@@ -13,13 +13,13 @@ This document tracks shipped capabilities and planned binary analysis, reverse-e
 - [x] **Verified Declarative Byte-Patching Engine (`src/patch.rs`)** — Constant-time expected-byte verification, pre/post SHA-256 integrity digests, optional `.bak` backup creation, and `zeroize` buffer scrubbing (`bsentinel patch`).
 - [x] **Cryptographic Constant & S-Box Scanner (`src/crypto_scan/`)** — Detect embedded cryptographic primitives, AES/Rijndael forward/inverse S-Boxes and Rcon, ChaCha20/Salsa20 sigma/tau magic constants, SHA-256/SHA-512 initial states and round constants, MD5/SHA-1 states, CRC-32 standard lookup tables, TEA/XTEA golden-ratio delta `0x9E3779B9`, and SM4 cipher S-Box with automated PE and ELF section and RVA resolution (`bsentinel crypto-scan`).
 - [x] **PE Import/Export Directory (IAT/ILT/EAT), imphash & Dynamic API Hash Resolver (`src/imports/`)** — Zero-dependency PE32/PE32+ Import Directory (`IMAGE_IMPORT_DESCRIPTOR`), Import Lookup Table, and Export Directory (`IMAGE_EXPORT_DIRECTORY`) parsing with forwarder resolution, Mandiant `imphash` (MD5 hex) generation, and dynamic API hash resolution (`ROR13`, `CRC32`, `DJB2`, `FNV-1a`) against common Windows DLL exports (`bsentinel imports`).
+- [x] **x86_64 Prologue/Epilogue & Control-Flow Pattern Scanner (`src/disasm/`)** — Pure-Rust instruction pattern scanner identifying function prologues, direct system call stubs (SysWhispers / Hell's Gate / Halo's Gate EDR bypasses), `RDTSC`/`RDTSCP` anti-debug timing checks, `CPUID`/`SMSW` VM probes, `INT 3`/`UD2` software traps, and `JMP RSP` stack pivots with automated PE and ELF section and RVA resolution (`bsentinel scan-code`).
 
 ---
 
 ## Planned Milestones
 
 ### Phase 1: Cross-Platform Executable Formats & Cryptographic Forensics
-- [ ] **x86_64 Prologue/Epilogue & Control-Flow Pattern Scanner (`src/disasm.rs`)** — Lightweight instruction boundary scanner identifying function prologues, `SYSCALL`/`INT 2E` direct system call stubs, `RDTSC` timing checks, `CPUID` hypervisor checks, and indirect call gadgets (`bsentinel scan-code`).
 - [ ] **YARA-Style Hex & Wildcard Pattern Rule Scanner (`src/rules.rs`)** — Fast declarative byte-signature matcher supporting nibble wildcards (`48 8B ?? ?? E8`), relative jump ranges, and boolean rule expressions (`bsentinel rule-scan`).
 
 ### Phase 2: Code Signing, Mach-O & Binary Diffing

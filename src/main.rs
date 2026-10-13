@@ -9,6 +9,7 @@ use clap::Parser;
 
 use bin_sentinel::cli::{Cli, Commands};
 use bin_sentinel::crypto_scan::scan_crypto_file;
+use bin_sentinel::disasm::scan_code_file;
 use bin_sentinel::elf::{build_synthetic_elf64, parse_elf, SHF_ALLOC, SHF_EXECINSTR, SHT_PROGBITS};
 use bin_sentinel::entropy::analyze_entropy_windows;
 use bin_sentinel::error::Result;
@@ -413,6 +414,68 @@ fn run() -> Result<()> {
                         println!(
                             "  {} | {:6} | {} ({})",
                             m.hash_hex, m.algorithm, m.api_name, m.dll
+                        );
+                    }
+                }
+            }
+        }
+        Commands::ScanCode { file, json } => {
+            let report = scan_code_file(&file)?;
+            if json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&report).unwrap_or_default()
+                );
+            } else {
+                println!(
+                    "=== x86_64 Code Pattern & Control-Flow Scan: {} ===",
+                    file.display()
+                );
+                println!("Format            : {}", report.binary_format);
+                println!("File Size         : {} bytes", report.file_size);
+                println!(
+                    "Exec Sections     : {}",
+                    if report.executable_sections.is_empty() {
+                        "(none / raw binary)".to_string()
+                    } else {
+                        report.executable_sections.join(", ")
+                    }
+                );
+                println!(
+                    "Patterns Found    : {} (Prologues: {}, Epilogues: {}, Syscalls: {}, Timing: {}, VM: {}, Traps: {}, Indirect: {})",
+                    report.summary.total_patterns,
+                    report.summary.prologues,
+                    report.summary.epilogues,
+                    report.summary.syscall_stubs,
+                    report.summary.anti_debug_timing,
+                    report.summary.vm_checks,
+                    report.summary.traps,
+                    report.summary.indirect_branches
+                );
+                if report.summary.suspicious_alerts_count > 0 {
+                    println!(
+                        "Security Alerts   : {} suspicious indicators detected",
+                        report.summary.suspicious_alerts_count
+                    );
+                }
+
+                if !report.matches.is_empty() {
+                    println!("\n[Detected Instructions & Control Flow]");
+                    for m in &report.matches {
+                        let sec_str = m.section_name.as_deref().unwrap_or("-");
+                        let rva_str = if let Some(rva) = m.relative_virtual_address {
+                            format!("RVA 0x{rva:08X}")
+                        } else {
+                            format!("Offset 0x{:08X}", m.offset)
+                        };
+                        let alert_str = if let Some(ref alert) = m.risk_alert {
+                            format!(" [ALERT: {alert}]")
+                        } else {
+                            String::new()
+                        };
+                        println!(
+                            "  {:16} | {:7} | {:18} | {:24} | {}{}",
+                            rva_str, sec_str, m.category, m.mnemonic, m.bytes_hex, alert_str
                         );
                     }
                 }
