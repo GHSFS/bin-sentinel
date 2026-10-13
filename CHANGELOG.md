@@ -5,6 +5,31 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-10-13
+
+### Added
+- Single-byte and multi-byte XOR, ADD, and ROL deobfuscation scanner & key recovery engine (`src/deobfuscate/`):
+  - Brute-force single-byte transformations (`decoder.rs` & `scanner.rs`):
+    - Exhaustive single-byte XOR decryption (keys `0x01..=0xFF`).
+    - Exhaustive single-byte additive cipher decoding (keys `0x01..=0xFF`).
+    - Bitwise rotate-left/rotate-right decoding (shifts `1..=7`).
+    - Bounded sliding window analysis (256-byte window, 64-byte stride) with intermediate buffer zeroization (`zeroize`).
+  - Known-plaintext crib dragging and repeating key recovery (`decoder.rs`):
+    - Multi-phase crib dragging evaluating candidate keys against standard plaintext signatures (`http://`, `https://`, `MZ`, `\x7FELF`, `HKLM\`, `HKCU\`, `Software\`).
+    - Key period validation and deduction for repeating single-byte, 2-byte, 4-byte, 8-byte, and 16-byte XOR keys.
+    - Phase-aligned multi-byte slice decoding around recovered key positions.
+  - Semantic decoded payload classification (`decoder.rs`):
+    - Network URL extraction (`http://`, `https://`, `ftp://`).
+    - Dotted-decimal IPv4 address validation.
+    - Windows Registry hive key path detection (`HKLM\`, `HKCU\`, `Software\Microsoft\`, etc.).
+    - Executable header magic detection: Windows PE (`MZ` / `PE\0\0`), Linux/BSD ELF (`\x7FELF`), and macOS Mach-O (`0xFEEDFACF`, `0xCAFEBABE`).
+    - Contiguous printable ASCII string sequence detection with word-boundary heuristics.
+  - Container and executable section correlation (`scanner.rs`):
+    - Automated section resolution and Relative Virtual Address (RVA) mapping across PE (`.text`, `.data`, `.rdata`), ELF, and Mach-O containers.
+  - CLI subcommand:
+    - `bsentinel xor-scan <file> [--json]`: human-readable terminal table reporting offset, RVA, section, cipher method, recovered key, confidence rating, and payload content, alongside structured JSON export.
+  - Comprehensive integration test suite (`tests/deobfuscate_test.rs`) covering single-byte XOR URL/IPv4, single-byte ADD Registry keys, ROL URL decoding, multi-byte XOR decoding, crib drag recovery, synthetic PE header detection, CLI JSON output, and zero false positives on random data.
+
 ## [0.10.0] - 2026-10-13
 
 ### Added

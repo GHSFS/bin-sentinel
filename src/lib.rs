@@ -6,6 +6,7 @@ pub mod authenticode;
 pub mod cli;
 pub mod commands;
 pub mod crypto_scan;
+pub mod deobfuscate;
 pub mod diff;
 pub mod disasm;
 pub mod elf;

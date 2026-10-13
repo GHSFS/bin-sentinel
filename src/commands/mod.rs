@@ -66,5 +66,6 @@ pub fn dispatch(command: Commands) -> Result<()> {
             json,
         } => diff::handle_apply_recipe(&file, &recipe, dry_run, reverse, backup, json),
         Commands::Rich { file, json } => rich::handle_rich(&file, json),
+        Commands::XorScan { file, json } => forensics::handle_xor_scan(&file, json),
     }
 }
