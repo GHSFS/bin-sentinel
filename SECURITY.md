@@ -16,6 +16,8 @@ Security updates are applied to the latest release series on the `main` branch.
 3. **Constant-Time Patch Verification**: Declarative byte patches validate expected target bytes using branchless constant-time comparison (`constant_time_eq`) and compute pre-patch/post-patch SHA-256 digests prior to atomic file replacement.
 4. **Sensitive Buffer Zeroization**: Intermediate binary patch buffers are scrubbed from memory on drop via `zeroize`.
 5. **Bounded Linear Scanning & Deterministic Memory Consumption**: Cryptographic constant and S-Box scanning operates strictly over bounded byte slices with linear byte matching, preventing unbounded recursion or denial-of-service on large untrusted binaries.
+6. **Bounded PE Import & Export Directory Parsing**: PE import descriptors (`IMAGE_IMPORT_DESCRIPTOR`), Import Lookup/Address Tables (ILT/IAT), and Export Directories (`IMAGE_EXPORT_DIRECTORY`) enforce hard caps (max 1,024 descriptors, max 4,096 thunks per descriptor, max 65,536 export symbols). RVA-to-file-offset translation guards against null RVAs, cyclic thunk tables, and truncated binary buffers, preventing infinite loops and out-of-bounds indexing.
+7. **Pure-Rust Imphash & Dynamic API Hash Resolution**: RFC 1321 MD5 message digest calculation (`imphash`) and dynamic API hash evaluation (ROR13, CRC32, DJB2, FNV-1a) run in 100% safe Rust without external C dependencies, static bounds validation, and zero execution of untrusted binary code.
 
 ## Reporting a Vulnerability
 

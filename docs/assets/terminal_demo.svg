@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 483" width="820" height="483">
+  <defs>
+    <filter id="windowShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Terminal Window Background -->
+  <rect x="0" y="0" width="820" height="483" rx="10" ry="10" fill="#0d1117" filter="url(#windowShadow)"/>
+  <rect x="0" y="0" width="820" height="44" rx="10" ry="10" fill="#161b22"/>
+  <rect x="0" y="40" width="820" height="4" fill="#161b22"/>
+  <line x1="0" y1="44" x2="820" y2="44" stroke="#30363d" stroke-width="1"/>
+
+  <!-- Traffic Light Window Buttons -->
+  <circle cx="20" cy="22" r="6" fill="#ff5f56"/>
+  <circle cx="38" cy="22" r="6" fill="#ffbd2e"/>
+  <circle cx="56" cy="22" r="6" fill="#27c93f"/>
+
+  <!-- Title -->
+  <text x="410" y="27" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="middle">
+    bin-sentinel — Windows Terminal
+  </text>
+
+  <!-- Terminal Content Body -->
+  <g>
+    <text x="20" y="77" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#7ee787" font-weight="bold">$ </tspan>
+      <tspan fill="#56d4dd" font-weight="bold">cargo run -- --help</tspan>
+    </text>
+    <text x="20" y="98" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">Zero-dependency binary forensics, PE static analyzer, packer entropy detector &amp; declarative byte-patching CLI</tspan>
+    </text>
+    <text x="20" y="119" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3"></tspan>
+    </text>
+    <text x="20" y="140" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">Usage: bsentinel.exe &lt;COMMAND&gt;</tspan>
+    </text>
+    <text x="20" y="161" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3"></tspan>
+    </text>
+    <text x="20" y="182" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">Commands:</tspan>
+    </text>
+    <text x="20" y="203" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  inspect      Inspect PE32/PE32+ headers, security mitigations (ASLR/DEP/CFG), section entropy, and packer anomalies</tspan>
+    </text>
+    <text x="20" y="224" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  entropy      Compute overall and sliding-window Shannon entropy, Chi-square uniformity, and byte classification</tspan>
+    </text>
+    <text x="20" y="245" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  strings      Extract printable ASCII and UTF-16LE strings and highlight Indicators of Compromise (IoCs)</tspan>
+    </text>
+    <text x="20" y="266" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  patch        Apply a verified declarative byte patch at a target file offset with SHA-256 verification</tspan>
+    </text>
+    <text x="20" y="287" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  synth-pe     Generate a deterministic synthetic PE32+ (64-bit) sample binary for forensic testing</tspan>
+    </text>
+    <text x="20" y="308" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  inspect-elf  Inspect Linux/BSD ELF64 headers, security mitigations (PIE/RELRO/NX/Canary), dynamic tags, and symbol tables</tspan>
+    </text>
+    <text x="20" y="329" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  synth-elf    Generate a deterministic synthetic ELF64 sample binary for forensic testing</tspan>
+    </text>
+    <text x="20" y="350" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  crypto-scan  Scan binary files for embedded cryptographic constants, S-Boxes, round keys, and lookup tables</tspan>
+    </text>
+    <text x="20" y="371" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  help         Print this message or the help of the given subcommand(s)</tspan>
+    </text>
+    <text x="20" y="392" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3"></tspan>
+    </text>
+    <text x="20" y="413" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">Options:</tspan>
+    </text>
+    <text x="20" y="434" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  -h, --help     Print help</tspan>
+    </text>
+    <text x="20" y="455" font-family="Consolas, 'Cascadia Code', monospace" font-size="13">
+      <tspan fill="#e6edf3">  -V, --version  Print version</tspan>
+    </text>
+
+  </g>
+</svg>

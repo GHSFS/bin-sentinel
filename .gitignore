@@ -1,0 +1,24 @@
+# Build artifacts & target directories
+/target/
+*.exe
+*.dll
+*.pdb
+*.bak
+*.tmp
+*.log
+
+# Internal engineering specifications, logs & distribution exclusions
+TASK_BACKLOG.md
+ARCHITECTURE_MAP.md
+AUTONOMOUS_SPEC.md
+WORK_LOG.md
+VIBE_CODING_MODULAR_GUIDE.md
+dev_logs/
+scripts/
+
+# Local configuration & secrets
+.env
+.env.*
+*.svault
+.vscode/
+.idea/

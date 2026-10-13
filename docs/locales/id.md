@@ -92,7 +92,11 @@ bsentinel strings sample.exe --ioc-only --json
 bsentinel crypto-scan sample.exe
 bsentinel crypto-scan sample.exe --json
 
-# 8. Apply a verified declarative byte patch with expected-byte check and .bak backup
+# 8. Inspect PE Import/Export tables (IAT/EAT), compute imphash & resolve dynamic API hashes
+bsentinel imports sample.exe
+bsentinel imports sample.exe --resolve-hash 0x0726774C --json
+
+# 9. Apply a verified declarative byte patch with expected-byte check and .bak backup
 bsentinel patch sample.exe --offset 0x200 --expect 4883EC28 --replace 90909090 --backup --json
 ```
 
@@ -118,10 +122,11 @@ bin-sentinel/
 ├── src/
 │   ├── lib.rs                     # Library module exports
 │   ├── main.rs                    # CLI entry point & human/JSON output formatting
-│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, crypto-scan, entropy, strings, patch)
+│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, entropy, strings, patch)
 │   ├── error.rs                   # Unified SentinelError & Result<T>
 │   ├── pe.rs                      # Zero-dependency PE32/PE32+ header & section parser + synthetic PE64 builder
 │   ├── elf/                       # Zero-dependency Linux/BSD ELF64 parser (headers, mod, synthetic builder)
+│   ├── imports/                   # PE Import/Export (IAT/EAT) parser, RFC 1321 MD5 imphash & dynamic API hash resolver
 │   ├── crypto_scan/               # Embedded cryptographic primitives, AES/SM4 S-Boxes & hash constants scanner
 │   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
 │   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
@@ -130,7 +135,8 @@ bin-sentinel/
 │   ├── pe_entropy_test.rs         # Integration tests for PE64 parsing, mitigations, entropy & CLI JSON
 │   ├── patch_strings_test.rs      # Integration tests for IoC extraction, verified patching & backups
 │   ├── elf_test.rs                # Integration tests for ELF64 parsing, PIE/RELRO/NX mitigations & dynamic symbols
-│   └── crypto_scan_test.rs        # Integration tests for cryptographic constants, S-Boxes & PE/ELF section mapping
+│   ├── crypto_scan_test.rs        # Integration tests for cryptographic constants, S-Boxes & PE/ELF section mapping
+│   └── imports_test.rs            # Integration tests for PE IAT/EAT tables, imphash & dynamic API hash resolution
 └── docs/
     ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
     └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams

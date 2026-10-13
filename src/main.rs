@@ -12,6 +12,7 @@ use bin_sentinel::crypto_scan::scan_crypto_file;
 use bin_sentinel::elf::{build_synthetic_elf64, parse_elf, SHF_ALLOC, SHF_EXECINSTR, SHT_PROGBITS};
 use bin_sentinel::entropy::analyze_entropy_windows;
 use bin_sentinel::error::Result;
+use bin_sentinel::imports::inspect_imports;
 use bin_sentinel::patch::{apply_patch, parse_hex_bytes, parse_offset};
 use bin_sentinel::pe::{
     build_synthetic_pe64, parse_pe, IMAGE_SCN_CNT_CODE, IMAGE_SCN_CNT_INITIALIZED_DATA,
@@ -336,6 +337,82 @@ fn run() -> Result<()> {
                         println!(
                             "  0x{:08X} | {:26} | {:24} | {:6} | {}{sec_str}",
                             m.offset, m.name, m.algorithm, m.confidence, m.description
+                        );
+                    }
+                }
+            }
+        }
+        Commands::Imports {
+            file,
+            resolve_hash,
+            json,
+        } => {
+            let data = fs::read(&file)?;
+            let mut report = inspect_imports(&data, resolve_hash.as_deref())?;
+            report.file_path = Some(file.display().to_string());
+            if json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&report).unwrap_or_default()
+                );
+            } else {
+                println!("=== PE Imports & Exports Analysis: {} ===", file.display());
+                println!("Format            : {}", report.format);
+                println!(
+                    "Imphash (MD5)     : {}",
+                    report.imphash.as_deref().unwrap_or("(none)")
+                );
+                println!("Imported DLLs     : {}", report.total_imported_descriptors);
+                println!("Total Functions   : {}", report.total_imported_functions);
+
+                if !report.import_descriptors.is_empty() {
+                    println!("\n[Import Descriptors]");
+                    for desc in &report.import_descriptors {
+                        println!(
+                            "  {} (IAT: 0x{:08X}, {} functions):",
+                            desc.dll_name,
+                            desc.first_thunk,
+                            desc.functions.len()
+                        );
+                        for f in &desc.functions {
+                            let sym = if let Some(ref name) = f.name {
+                                name.clone()
+                            } else if let Some(ord) = f.ordinal {
+                                format!("Ordinal #{ord}")
+                            } else {
+                                "Unknown".to_string()
+                            };
+                            println!("    0x{:08X} | {}", f.iat_rva, sym);
+                        }
+                    }
+                }
+
+                if let Some(ref exp) = report.export_info {
+                    println!("\n[Export Directory: {}]", exp.dll_name);
+                    println!(
+                        "  Functions: {} | Names: {} | Base Ordinal: {}",
+                        exp.number_of_functions, exp.number_of_names, exp.base_ordinal
+                    );
+                    for f in &exp.functions {
+                        let name_str = f.name.as_deref().unwrap_or("(by ordinal)");
+                        let fwd_str = if let Some(ref fwd) = f.forwarder {
+                            format!(" -> {fwd}")
+                        } else {
+                            String::new()
+                        };
+                        println!(
+                            "    Ord {:4} | RVA 0x{:08X} | {}{}",
+                            f.ordinal, f.rva, name_str, fwd_str
+                        );
+                    }
+                }
+
+                if !report.resolved_api_hashes.is_empty() {
+                    println!("\n[Resolved API Hashes]");
+                    for m in &report.resolved_api_hashes {
+                        println!(
+                            "  {} | {:6} | {} ({})",
+                            m.hash_hex, m.algorithm, m.api_name, m.dll
                         );
                     }
                 }

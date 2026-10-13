@@ -5,6 +5,26 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-10-13
+
+### Added
+- PE Import Directory (`IMAGE_IMPORT_DESCRIPTOR`), Import Lookup Table (ILT/IAT), and Export Directory (`IMAGE_EXPORT_DIRECTORY`) parser (`src/imports/parser.rs`):
+  - Robust bounds-checked parsing of both 32-bit (PE32) and 64-bit (PE32+) import tables.
+  - Full support for named imports (`IMAGE_IMPORT_BY_NAME` with hints) and ordinal imports across multiple DLL descriptors.
+  - Complete parsing of Export Directory structures (`IMAGE_EXPORT_DIRECTORY`), including `AddressOfFunctions`, `AddressOfNames`, and `AddressOfNameOrdinals` tables.
+  - Forwarded export detection and string resolution (e.g. forwarders pointing inside the export directory boundary like `NTDLL.RtlAllocateHeap`).
+- Pure-Rust RFC 1321 MD5 message digest and Mandiant `imphash` implementation (`src/imports/imphash.rs`):
+  - Zero-external-dependency RFC 1321 MD5 hashing engine with standard test vector verification.
+  - Strict Mandiant / FireEye `imphash` specification compliance (lowercase symbol normalisation, stripping `.dll`, `.sys`, `.ocx` extensions, formatting named and ordinal imports, and MD5 hexadecimal encoding).
+- Dynamic API hash resolution engine (`src/imports/api_hash.rs`):
+  - Implements 4 standard hashing algorithms commonly observed in evasive shellcode and stealth loaders: Rotate Right 13 (`ROR13`), IEEE 802.3 `CRC32`, `DJB2`, and `FNV-1a`.
+  - Curated database of over 80 high-frequency Windows APIs (`kernel32.dll`, `ntdll.dll`, `user32.dll`, `advapi32.dll`, `ws2_32.dll`, `wininet.dll`).
+  - Automated hash matching against known APIs and dynamically exported functions from inspected binaries.
+- Deterministic synthetic PE32 and PE32+ generator with valid import and export directories (`src/imports/synthetic.rs`).
+- CLI subcommand:
+  - `bsentinel imports <file> [--resolve-hash <hex>] [--json]`: comprehensive import/export table analysis, imphash generation, and dynamic API hash resolution.
+- Isolated integration test suite in `tests/imports_test.rs`.
+
 ## [0.3.0] - 2026-10-13
 
 ### Added

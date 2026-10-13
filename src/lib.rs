@@ -7,6 +7,7 @@ pub mod crypto_scan;
 pub mod elf;
 pub mod entropy;
 pub mod error;
+pub mod imports;
 pub mod patch;
 pub mod pe;
 pub mod strings;

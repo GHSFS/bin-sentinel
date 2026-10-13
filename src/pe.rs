@@ -23,6 +23,29 @@ pub const IMAGE_SCN_MEM_EXECUTE: u32 = 0x2000_0000;
 pub const IMAGE_SCN_MEM_READ: u32 = 0x4000_0000;
 pub const IMAGE_SCN_MEM_WRITE: u32 = 0x8000_0000;
 
+pub const IMAGE_DIRECTORY_ENTRY_EXPORT: usize = 0;
+pub const IMAGE_DIRECTORY_ENTRY_IMPORT: usize = 1;
+pub const IMAGE_DIRECTORY_ENTRY_RESOURCE: usize = 2;
+pub const IMAGE_DIRECTORY_ENTRY_EXCEPTION: usize = 3;
+pub const IMAGE_DIRECTORY_ENTRY_SECURITY: usize = 4;
+pub const IMAGE_DIRECTORY_ENTRY_BASERELOC: usize = 5;
+pub const IMAGE_DIRECTORY_ENTRY_DEBUG: usize = 6;
+pub const IMAGE_DIRECTORY_ENTRY_ARCHITECTURE: usize = 7;
+pub const IMAGE_DIRECTORY_ENTRY_GLOBALPTR: usize = 8;
+pub const IMAGE_DIRECTORY_ENTRY_TLS: usize = 9;
+pub const IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG: usize = 10;
+pub const IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT: usize = 11;
+pub const IMAGE_DIRECTORY_ENTRY_IAT: usize = 12;
+pub const IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT: usize = 13;
+pub const IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR: usize = 14;
+
+/// Data directory entry specifying the RVA and size of an image table.
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq, Default)]
+pub struct DataDirectory {
+    pub virtual_address: u32,
+    pub size: u32,
+}
+
 /// Exploit mitigation flags extracted from the Optional Header `DllCharacteristics`.
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 pub struct SecurityMitigations {
@@ -61,8 +84,21 @@ pub struct PeInfo {
     pub dll_characteristics: u16,
     pub mitigations: SecurityMitigations,
     pub overall_entropy: f64,
+    pub data_directories: Vec<DataDirectory>,
     pub sections: Vec<SectionInfo>,
     pub alerts: Vec<String>,
+}
+
+impl PeInfo {
+    /// Translates a Relative Virtual Address (RVA) to a raw file offset using the image sections.
+    pub fn rva_to_offset(&self, rva: u32) -> Option<usize> {
+        rva_to_file_offset(&self.sections, rva)
+    }
+
+    /// Retrieves a data directory by entry index if present.
+    pub fn data_directory(&self, index: usize) -> Option<&DataDirectory> {
+        self.data_directories.get(index)
+    }
 }
 
 fn read_u16_le(data: &[u8], offset: usize) -> Result<u16> {
@@ -124,6 +160,35 @@ fn format_permissions(chars: u32) -> String {
         '-'
     };
     format!("{r}{w}{x}")
+}
+
+/// Translates a Relative Virtual Address (RVA) to a raw file offset within the PE image.
+pub fn rva_to_file_offset(sections: &[SectionInfo], rva: u32) -> Option<usize> {
+    if rva == 0 {
+        return None;
+    }
+    for sec in sections {
+        let sec_len = if sec.virtual_size > 0 {
+            sec.virtual_size
+        } else {
+            sec.raw_size
+        };
+        if rva >= sec.virtual_address && rva < sec.virtual_address.saturating_add(sec_len) {
+            let offset_into_sec = rva - sec.virtual_address;
+            if offset_into_sec < sec.raw_size {
+                return (sec.raw_offset as usize).checked_add(offset_into_sec as usize);
+            }
+        }
+    }
+    let first_sec_va = sections
+        .iter()
+        .map(|s| s.virtual_address)
+        .min()
+        .unwrap_or(0x1000);
+    if rva < first_sec_va {
+        return Some(rva as usize);
+    }
+    None
 }
 
 /// Parses a Windows PE32 or PE32+ executable buffer with strict bounds validation.
@@ -194,25 +259,64 @@ pub fn parse_pe(data: &[u8]) -> Result<PeInfo> {
     let opt_magic = read_u16_le(data, opt_offset)?;
     let entry_point = read_u32_le(data, opt_offset + 16)?;
 
-    let (format_name, image_base, subsystem, dll_characteristics) = match opt_magic {
-        PE32_MAGIC => {
-            let base = u64::from(read_u32_le(data, opt_offset + 28)?);
-            let subsys = read_u16_le(data, opt_offset + 68)?;
-            let dll_chars = read_u16_le(data, opt_offset + 70)?;
-            ("PE32".to_string(), base, subsys, dll_chars)
+    let (format_name, image_base, subsystem, dll_characteristics, data_dir_start, num_rva_sizes) =
+        match opt_magic {
+            PE32_MAGIC => {
+                let base = u64::from(read_u32_le(data, opt_offset + 28)?);
+                let subsys = read_u16_le(data, opt_offset + 68)?;
+                let dll_chars = read_u16_le(data, opt_offset + 70)?;
+                let num_rva = if size_of_optional_header >= 96 {
+                    read_u32_le(data, opt_offset + 92).unwrap_or(0)
+                } else {
+                    0
+                };
+                (
+                    "PE32".to_string(),
+                    base,
+                    subsys,
+                    dll_chars,
+                    opt_offset + 96,
+                    num_rva,
+                )
+            }
+            PE32_PLUS_MAGIC => {
+                let base = read_u64_le(data, opt_offset + 24)?;
+                let subsys = read_u16_le(data, opt_offset + 68)?;
+                let dll_chars = read_u16_le(data, opt_offset + 70)?;
+                let num_rva = if size_of_optional_header >= 112 {
+                    read_u32_le(data, opt_offset + 108).unwrap_or(0)
+                } else {
+                    0
+                };
+                (
+                    "PE32+ (64-bit)".to_string(),
+                    base,
+                    subsys,
+                    dll_chars,
+                    opt_offset + 112,
+                    num_rva,
+                )
+            }
+            other => {
+                return Err(SentinelError::InvalidFormat(format!(
+                    "Unsupported Optional Header magic: 0x{other:04X}"
+                )));
+            }
+        };
+
+    let mut data_directories = Vec::new();
+    let max_dirs = (num_rva_sizes as usize).min(16);
+    for idx in 0..max_dirs {
+        let entry_off = data_dir_start + (idx * 8);
+        if entry_off + 8 <= opt_offset + size_of_optional_header && entry_off + 8 <= data.len() {
+            let va = read_u32_le(data, entry_off)?;
+            let sz = read_u32_le(data, entry_off + 4)?;
+            data_directories.push(DataDirectory {
+                virtual_address: va,
+                size: sz,
+            });
         }
-        PE32_PLUS_MAGIC => {
-            let base = read_u64_le(data, opt_offset + 24)?;
-            let subsys = read_u16_le(data, opt_offset + 68)?;
-            let dll_chars = read_u16_le(data, opt_offset + 70)?;
-            ("PE32+ (64-bit)".to_string(), base, subsys, dll_chars)
-        }
-        other => {
-            return Err(SentinelError::InvalidFormat(format!(
-                "Unsupported Optional Header magic: 0x{other:04X}"
-            )));
-        }
-    };
+    }
 
     let mitigations = SecurityMitigations {
         aslr: (dll_characteristics & IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE) != 0,
@@ -291,6 +395,7 @@ pub fn parse_pe(data: &[u8]) -> Result<PeInfo> {
         dll_characteristics,
         mitigations,
         overall_entropy,
+        data_directories,
         sections,
         alerts: Vec::new(),
     };
@@ -338,6 +443,7 @@ pub fn build_synthetic_pe64(sections: &[(&str, &[u8], u32)]) -> Vec<u8> {
         | IMAGE_DLLCHARACTERISTICS_NX_COMPAT
         | IMAGE_DLLCHARACTERISTICS_GUARD_CF;
     buf[opt + 70..opt + 72].copy_from_slice(&dll_chars.to_le_bytes());
+    buf[opt + 108..opt + 112].copy_from_slice(&16u32.to_le_bytes()); // NumberOfRvaAndSizes (16 data directories)
 
     // 5. Section Headers & Raw Data
     let mut current_rva: u32 = 0x1000;

@@ -99,4 +99,15 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Parse PE Import Directory (IAT/ILT), Export Directory (EAT), imphash, and resolve dynamic API hashes.
+    Imports {
+        /// Target PE binary file path.
+        file: PathBuf,
+        /// Optional API hash (in hex, e.g. 0xEDB88320 or EDB88320) to resolve against known Windows APIs.
+        #[arg(long)]
+        resolve_hash: Option<String>,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }
