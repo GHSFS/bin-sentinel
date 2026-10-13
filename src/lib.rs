@@ -10,6 +10,7 @@ pub mod elf;
 pub mod entropy;
 pub mod error;
 pub mod imports;
+pub mod macho;
 pub mod patch;
 pub mod pe;
 pub mod rules;
