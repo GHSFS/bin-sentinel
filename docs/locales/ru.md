@@ -98,6 +98,14 @@ bsentinel imports sample.exe --resolve-hash 0x0726774C --json
 
 # 9. Apply a verified declarative byte patch with expected-byte check and .bak backup
 bsentinel patch sample.exe --offset 0x200 --expect 4883EC28 --replace 90909090 --backup --json
+
+# 10. Scan x86_64 prologues, direct syscalls, RDTSC anti-debug & CPUID checks
+bsentinel scan-code sample.exe
+bsentinel scan-code sample.exe --json
+
+# 11. Scan declarative YARA-style hex signatures with wildcards, byte jumps & JSON rules
+bsentinel rule-scan sample.exe --pattern "48 83 EC ?? [2-6] E8"
+bsentinel rule-scan sample.exe --rules rules.json --json
 ```
 
 </details>
@@ -121,13 +129,16 @@ bin-sentinel/
 ├── NOTICE                         # Attribution notice owned by GHSFS
 ├── src/
 │   ├── lib.rs                     # Library module exports
-│   ├── main.rs                    # CLI entry point & human/JSON output formatting
-│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, entropy, strings, patch)
+│   ├── main.rs                    # Streamlined CLI entry point dispatching to commands
+│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, scan-code, rule-scan, etc.)
+│   ├── commands/                  # Modular CLI subcommands (inspect, forensics, rules)
 │   ├── error.rs                   # Unified SentinelError & Result<T>
 │   ├── pe.rs                      # Zero-dependency PE32/PE32+ header & section parser + synthetic PE64 builder
 │   ├── elf/                       # Zero-dependency Linux/BSD ELF64 parser (headers, mod, synthetic builder)
 │   ├── imports/                   # PE Import/Export (IAT/EAT) parser, RFC 1321 MD5 imphash & dynamic API hash resolver
 │   ├── crypto_scan/               # Embedded cryptographic primitives, AES/SM4 S-Boxes & hash constants scanner
+│   ├── disasm/                    # x86_64 prologue/epilogue, direct syscalls & control-flow pattern scanner
+│   ├── rules/                     # Declarative YARA-style hex signature, nibble wildcard & byte jump scanner
 │   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
 │   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
 │   └── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
@@ -136,7 +147,9 @@ bin-sentinel/
 │   ├── patch_strings_test.rs      # Integration tests for IoC extraction, verified patching & backups
 │   ├── elf_test.rs                # Integration tests for ELF64 parsing, PIE/RELRO/NX mitigations & dynamic symbols
 │   ├── crypto_scan_test.rs        # Integration tests for cryptographic constants, S-Boxes & PE/ELF section mapping
-│   └── imports_test.rs            # Integration tests for PE IAT/EAT tables, imphash & dynamic API hash resolution
+│   ├── imports_test.rs            # Integration tests for PE IAT/EAT tables, imphash & dynamic API hash resolution
+│   ├── disasm_test.rs             # Integration tests for x86_64 prologues, direct syscalls & anti-debug checks
+│   └── rules_test.rs              # Integration tests for YARA-style hex wildcards, jumps, strings & JSON rule sets
 └── docs/
     ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
     └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams

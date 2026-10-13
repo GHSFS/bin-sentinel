@@ -3,6 +3,7 @@
 // Copyright 2026 GHSFS. See the NOTICE file for attribution details.
 
 pub mod cli;
+pub mod commands;
 pub mod crypto_scan;
 pub mod disasm;
 pub mod elf;
@@ -11,4 +12,5 @@ pub mod error;
 pub mod imports;
 pub mod patch;
 pub mod pe;
+pub mod rules;
 pub mod strings;

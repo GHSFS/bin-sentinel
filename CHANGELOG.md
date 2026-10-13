@@ -5,6 +5,32 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-10-13
+
+### Added
+- Declarative YARA-style hex signature and pattern rule scanner (`src/rules/`):
+  - Advanced hex pattern tokenization (`parser.rs`):
+    - Full wildcard bytes (`??` and `?`) matching any candidate byte value.
+    - Nibble-level wildcards: high-nibble (`?8`, matching `(b & 0x0F) == 0x08`) and low-nibble (`4?`, matching `(b & 0xF0) == 0x40`).
+    - Bounded byte jump intervals: fixed jumps `[N]` and range jumps `[min-max]` (e.g. `[2-6]`) with security bounds checking (`MAX_JUMP_LIMIT`).
+    - Continuous and whitespace-delimited hex sequence formatting (`48 83 EC ?? [2-6] E8`).
+  - String condition tokenization:
+    - ASCII string patterns with optional case-insensitive evaluation (`nocase`).
+    - UTF-16LE wide string patterns with case-insensitive ASCII character normalization.
+  - Multi-pattern declarative rule engine (`engine.rs`):
+    - Rule conditions: `all` (every defined pattern must match), `any` (at least one pattern matches), and `count(N)` (at least N distinct patterns match).
+    - Threat severity classification: `Low`, `Medium`, `High`, and `Critical`.
+    - Flexible JSON rule deserialization supporting single rules, lists of rules, and wrapped `RuleSetDefinition` schemas.
+  - High-performance slice matcher (`matcher.rs`):
+    - Fast-path linear scanner for jump-free byte patterns operating at memory bandwidth speeds.
+    - DFS jump resolution with recursion depth limits (`MAX_DFS_DEPTH = 64`) and match span limits (`MAX_MATCH_SPAN = 65536`) to protect against catastrophic backtracking.
+    - Automated PE and ELF section correlation resolving containing section names, RVAs, virtual addresses, and alerting on matches inside anomalous RWX sections.
+- CLI subcommand:
+  - `bsentinel rule-scan <file> [--pattern <hex>] [--rules <file.json>] [--json]`: fast ad-hoc signature or structured multi-rule triage with human-readable table and structured JSON reports.
+- Modular CLI command architecture (`src/commands/`):
+  - Refactored CLI handlers into domain modules (`inspect.rs`, `forensics.rs`, `rules.rs`, `mod.rs`), streamlining `src/main.rs` to an 18-line entry point.
+- Dedicated integration test suite in `tests/rules_test.rs` covering wildcards, jumps, strings, JSON rule sets, PE/ELF section mapping, and CLI execution.
+
 ## [0.5.0] - 2026-10-13
 
 ### Added

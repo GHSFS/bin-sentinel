@@ -118,4 +118,18 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Scan binary files using declarative YARA-style hex signatures with wildcards, byte jumps, or JSON rule files.
+    RuleScan {
+        /// Target binary file path.
+        file: PathBuf,
+        /// Ad-hoc hex pattern with wildcards and jumps (e.g. "48 83 EC ?? [2-6] E8").
+        #[arg(long, short = 'p')]
+        pattern: Option<String>,
+        /// Path to declarative JSON rule file.
+        #[arg(long, short = 'r')]
+        rules: Option<PathBuf>,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }
