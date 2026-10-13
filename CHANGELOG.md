@@ -5,6 +5,34 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-10-13
+
+### Added
+- PE Authenticode digital signature and attribute certificate table inspector (`src/authenticode/`):
+  - Digital Certificate Table parser (`parser.rs`):
+    - Traversal of PE `IMAGE_DIRECTORY_ENTRY_SECURITY` (Data Directory index 4) with file offset and length bounds validation.
+    - 8-byte aligned `WIN_CERTIFICATE` entry extraction supporting revisions `WIN_CERT_REVISION_1_0` (0x0100) and `WIN_CERT_REVISION_2_0` (0x0200).
+    - Certificate container classifications: `WIN_CERT_TYPE_X509` (0x0001), `WIN_CERT_TYPE_PKCS_SIGNED_DATA` (0x0002), and Terminal Server signed structures.
+  - PKCS#7 / CMS SignedData ASN.1 DER parser (`parser.rs`):
+    - Structural extraction of `SpcIndirectDataContent` message digests and algorithm identification (`SHA-256`, `SHA-1`, `SHA-384`, `SHA-512`, `MD5`).
+    - Detection of countersignatures and RFC 3161 timestamp tokens (`1.3.6.1.4.1.311.3.3.1` and `1.2.840.113549.1.9.6`).
+    - Program name and description metadata extraction from `spcSpOpusInfo` attributes.
+  - Microsoft Authenticode PE image digest calculator (`digest.rs`):
+    - Implementation of official Microsoft Authenticode PE image hashing specification.
+    - Deterministic exclusion of PE Optional Header `CheckSum` field (4 bytes) and Security Directory entry (8 bytes).
+    - Section table ordering sorted ascending by `PointerToRawData` and sequential section chunk hashing.
+    - Hash calculation for both SHA-256 (via `sha2`) and pure-Rust RFC 3174 SHA-1 (`sha1.rs`).
+    - Constant-time verification between calculated image digests and embedded certificate digests.
+  - Physical PE boundary analysis and EOF overlay detector (`overlay.rs`):
+    - Calculation of legitimate binary physical boundary: `max(raw_section_end)` + Certificate Table size.
+    - Detection of appended trailing data past the legitimate image boundary.
+    - High-resolution Shannon entropy calculation, overlay file size ratio, and signature heuristics (ZIP, 7-Zip, RAR, GZIP, XZ, nested PE "MZ", nested ELF, nested Mach-O, PDF, and PNG).
+  - Deterministic synthetic signed PE64 generator (`synthetic.rs`):
+    - `build_synthetic_signed_pe64` building structurally valid 64-bit PE binaries with genuine Authenticode SHA-256 digests and optional overlay injection for automated test pipelines.
+- CLI subcommand:
+  - `bsentinel sig-check <file> [--json]`: comprehensive digital signature, digest verification, and overlay telemetry report in clean terminal table or JSON format.
+- Modular integration test suite in `tests/authenticode_test.rs` covering unsigned PE inspection, valid signed PE verification, tampered code digest mismatch alerts, EOF overlay detection, and CLI JSON verification.
+
 ## [0.7.0] - 2026-10-13
 
 ### Added
