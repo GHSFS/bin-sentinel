@@ -2,6 +2,7 @@
 // http://www.apache.org/licenses/LICENSE-2.0>.
 // Copyright 2026 GHSFS. See the NOTICE file for attribution details.
 
+pub mod authenticode;
 pub mod forensics;
 pub mod inspect;
 pub mod macho;
@@ -47,5 +48,6 @@ pub fn dispatch(command: Commands) -> Result<()> {
             rules: rules_path,
             json,
         } => rules::handle_rule_scan(&file, pattern.as_deref(), rules_path.as_deref(), json),
+        Commands::SigCheck { file, json } => authenticode::handle_sig_check(&file, json),
     }
 }

@@ -148,4 +148,12 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Inspect PE Authenticode digital signatures, certificate tables, True digest, and EOF overlays.
+    SigCheck {
+        /// Target PE binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }

@@ -16,13 +16,13 @@ This document tracks shipped capabilities and planned binary analysis, reverse-e
 - [x] **x86_64 Prologue/Epilogue & Control-Flow Pattern Scanner (`src/disasm/`)** — Pure-Rust instruction pattern scanner identifying function prologues, direct system call stubs (SysWhispers / Hell's Gate / Halo's Gate EDR bypasses), `RDTSC`/`RDTSCP` anti-debug timing checks, `CPUID`/`SMSW` VM probes, `INT 3`/`UD2` software traps, and `JMP RSP` stack pivots with automated PE and ELF section and RVA resolution (`bsentinel scan-code`).
 - [x] **YARA-Style Hex & Wildcard Pattern Rule Scanner (`src/rules/`)** — Declarative byte-signature and rule matching engine supporting exact hex bytes, full wildcards (`??`), nibble wildcards (`?8`, `4?`), bounded byte jumps (`[2-6]`), case-insensitive ASCII and UTF-16LE wide string patterns, multi-pattern boolean rule evaluation (`all`, `any`, `count`), JSON rule files, and PE/ELF section and RWX anomaly correlation (`bsentinel rule-scan`).
 - [x] **Mach-O Universal (Fat) & ARM64/x86_64 Binary Parser (`src/macho/`)** — Zero-dependency macOS/iOS Mach-O parser supporting 64-bit binaries (`0xFEEDFACF`) and Universal Fat multi-architecture containers (`0xCAFEBABE`), load commands (`LC_SEGMENT_64`, `LC_MAIN`, `LC_LOAD_DYLIB`, `LC_CODE_SIGNATURE`), section Shannon entropy profiling, security mitigations (`PIE`, `CodeSignature`, non-executable stack), and deterministic sample generation (`bsentinel inspect-macho`, `bsentinel synth-macho`).
+- [x] **PE Authenticode Digital Signature & EOF Overlay Inspector (`src/authenticode/`)** — Zero-dependency PE certificate table (`IMAGE_DIRECTORY_ENTRY_SECURITY` / `WIN_CERTIFICATE`) parser, PKCS#7 / CMS SignedData ASN.1 DER parser (`SpcIndirectDataContent` message digests, timestamp tokens, Opus info), Microsoft Authenticode PE image digest calculation (excluding checksum and security directory) for SHA-256 and pure-Rust SHA-1, physical boundary calculation, Shannon entropy profiling and heuristic classification for appended EOF overlays, and deterministic signed PE generator (`bsentinel sig-check`).
 
 ---
 
 ## Planned Milestones
 
 ### Phase 2: Code Signing, Digital Signatures & Binary Diffing
-- [ ] **PE Authenticode & Overlay Digital Signature Inspector (`src/authenticode.rs`)** — Inspect `IMAGE_DIRECTORY_ENTRY_SECURITY` PKCS#7 / CMS signature structures, certificate chains, Authenticode PE image hash calculation (excluding checksum and security directory), and trailing EOF overlay data (`bsentinel sig-check`).
 - [ ] **Structural Binary Diff & Patch Recipe Generator (`src/diff.rs`)** — Compare two binaries section-by-section and byte-by-byte, exporting a reproducible JSON declarative patch manifest (`bsentinel diff <orig> <modified>`).
 - [ ] **PE Rich Header & Compiler Toolchain Fingerprinter (`src/rich.rs`)** — Decrypt XOR-masked Microsoft Rich headers to identify Visual Studio linker/compiler build versions and object counts (`bsentinel rich`).
 - [ ] **PE Resource Directory (`.rsrc`) & Manifest Inspector (`src/resources.rs`)** — Traverse 3-level PE resource trees to extract embedded XML UAC manifests, `VS_VERSIONINFO` metadata, icons, and high-entropy embedded payloads (`bsentinel resources`).
@@ -37,4 +37,11 @@ This document tracks shipped capabilities and planned binary analysis, reverse-e
 - [ ] **Unified Multi-Format Binary Triage Dispatcher (`src/triage.rs`)** — Auto-detect binary format from magic bytes and dispatch all relevant telemetry (`bsentinel triage`).
 - [ ] **WebAssembly (`\0asm`) Binary Module & Function Import/Export Inspector (`src/wasm.rs`)** — Parse Wasm binary modules, custom name sections, imported host functions, and memory limits (`bsentinel inspect-wasm`).
 - [ ] **Android Dalvik Executable (`dex\n035\0`) Header & Class Pool Inspector (`src/dex.rs`)** — Parse DEX headers, string/type identifiers, and class def tables (`bsentinel inspect-dex`).
+
+### Phase 4: Low-Level Forensics, Crash Dumps & Memory Analysis
+- [ ] **Windows 64-bit Kernel Crash Dump Physical Memory Parser (`src/memory_dump.rs`)** — Parse complete 64-bit kernel memory crash dumps, physical memory runs (`PHYSICAL_MEMORY_RUN`), and KDDEBUGGER_DATA64 blocks (`bsentinel inspect-kernel-dmp`).
+- [ ] **PE Export Address Table Collision & Hash Stomping Detector (`src/eat_collision.rs`)** — Scan export directories for hash collisions, duplicate ordinals, and null name pointer anomalies used to blind API monitoring hooks (`bsentinel check-eat`).
+- [ ] **Apple Mach-O Code Directory (CodeDir) CDHash & Slot Validator (`src/cdhash.rs`)** — Validate authentic CDHash (SHA-1/SHA-256) and verify per-page code slot hashes against binary slices (`bsentinel cdhash`).
+- [ ] **Linux ELF GNU Property Note & Control-Flow Mitigation Inspector (`src/elf_notes.rs`)** — Inspect ELF `.note.gnu.property` descriptors to verify Linux AArch64 BTI/PAC and x86_64 IBT/SHSTK enforcement (`bsentinel inspect-notes`).
+- [ ] **PE Authenticode Dual-Signature Architecture & Metadata Extractor (`src/dual_sig.rs`)** — Parse secondary nested `WIN_CERTIFICATE` entries and SpcSpOpusInfo publisher metadata (`bsentinel inspect-dual-sig`).
 
