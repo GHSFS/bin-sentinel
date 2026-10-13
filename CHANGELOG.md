@@ -5,6 +5,28 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-10-13
+
+### Added
+- Structural binary diffing and declarative patch manifest engine (`src/diff/`):
+  - Binary comparison and format mapping engine (`engine.rs`):
+    - Linear scan identifying contiguous byte differences between arbitrary binary streams.
+    - Automated format classification across Windows PE, Linux/BSD ELF, Apple Mach-O, and raw byte streams.
+    - Automatic correlation of differing hunks to containing binary sections (`.text`, `.data`, `.rdata`, etc.) and computing relative virtual addresses (RVAs).
+    - Per-section Shannon entropy deltas identifying compressed or encrypted modifications.
+    - Security mitigation diffing detecting alterations to ASLR, DEP/NX, CFG, PIE, RELRO, and Code Signing.
+  - Declarative patch recipe manifest and atomic application engine (`recipe.rs`):
+    - `PatchRecipe` and `PatchOperation` data structures with formatted JSON serialization.
+    - Reversible patches with automatic `reverse()` manifest synthesis swapping expected and replacement bytes and pre/post hashes.
+    - Multi-phase atomic verification: constant-time verification of all patch targets prior to applying any disk modifications.
+    - Dry-run validation mode calculating prospective post-patch SHA-256 without writing to disk.
+    - Automatic `.bak` backup generation prior to live modifications.
+    - `zeroize` memory scrubbing of sensitive payload buffers during and after patch operations.
+  - CLI subcommands:
+    - `bsentinel diff <original> <modified> [--out-recipe <json>] [--json]`: human-readable terminal summary and structured JSON diffing output with section-level details.
+    - `bsentinel apply-recipe <file> <recipe.json> [--dry-run] [--reverse] [--backup] [--json]`: verified atomic recipe application and reversal.
+  - Comprehensive unit and integration test suite (`tests/diff_test.rs`) covering raw byte hunking, PE section and RVA resolution, ELF section mapping, recipe JSON roundtrips, dry-run safety, live application with backup, clean reversal, and tamper rejection.
+
 ## [0.8.0] - 2026-10-13
 
 ### Added

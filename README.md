@@ -106,6 +106,15 @@ bsentinel scan-code sample.exe --json
 # 11. Scan declarative YARA-style hex signatures with wildcards, byte jumps & JSON rules
 bsentinel rule-scan sample.exe --pattern "48 83 EC ?? [2-6] E8"
 bsentinel rule-scan sample.exe --rules rules.json --json
+
+# 12. Compare two binaries structurally and export a declarative JSON patch recipe
+bsentinel diff baseline.exe modified.exe --out-recipe patch.json
+bsentinel diff baseline.exe modified.exe --json
+
+# 13. Apply or reverse a declarative patch recipe with dry-run verification and backup
+bsentinel apply-recipe baseline.exe patch.json --dry-run
+bsentinel apply-recipe baseline.exe patch.json --backup
+bsentinel apply-recipe baseline.exe patch.json --reverse
 ```
 
 </details>
@@ -141,7 +150,8 @@ bin-sentinel/
 │   ├── rules/                     # Declarative YARA-style hex signature, nibble wildcard & byte jump scanner
 │   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
 │   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
-│   └── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
+│   ├── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
+│   └── diff/                      # Structural binary diffing & declarative patch recipe engine
 ├── tests/
 │   ├── pe_entropy_test.rs         # Integration tests for PE64 parsing, mitigations, entropy & CLI JSON
 │   ├── patch_strings_test.rs      # Integration tests for IoC extraction, verified patching & backups
@@ -149,7 +159,8 @@ bin-sentinel/
 │   ├── crypto_scan_test.rs        # Integration tests for cryptographic constants, S-Boxes & PE/ELF section mapping
 │   ├── imports_test.rs            # Integration tests for PE IAT/EAT tables, imphash & dynamic API hash resolution
 │   ├── disasm_test.rs             # Integration tests for x86_64 prologues, direct syscalls & anti-debug checks
-│   └── rules_test.rs              # Integration tests for YARA-style hex wildcards, jumps, strings & JSON rule sets
+│   ├── rules_test.rs              # Integration tests for YARA-style hex wildcards, jumps, strings & JSON rule sets
+│   └── diff_test.rs               # Integration tests for structural diffing, patch recipes & atomic reversal
 └── docs/
     ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
     └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams

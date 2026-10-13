@@ -3,6 +3,7 @@
 // Copyright 2026 GHSFS. See the NOTICE file for attribution details.
 
 pub mod authenticode;
+pub mod diff;
 pub mod forensics;
 pub mod inspect;
 pub mod macho;
@@ -49,5 +50,19 @@ pub fn dispatch(command: Commands) -> Result<()> {
             json,
         } => rules::handle_rule_scan(&file, pattern.as_deref(), rules_path.as_deref(), json),
         Commands::SigCheck { file, json } => authenticode::handle_sig_check(&file, json),
+        Commands::Diff {
+            original,
+            modified,
+            out_recipe,
+            json,
+        } => diff::handle_diff(&original, &modified, out_recipe.as_deref(), json),
+        Commands::ApplyRecipe {
+            file,
+            recipe,
+            dry_run,
+            reverse,
+            backup,
+            json,
+        } => diff::handle_apply_recipe(&file, &recipe, dry_run, reverse, backup, json),
     }
 }

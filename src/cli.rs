@@ -156,4 +156,36 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Compare two binary files and generate structural byte/section diffs and patch recipes.
+    Diff {
+        /// Original (baseline) binary file path.
+        original: PathBuf,
+        /// Modified (target) binary file path.
+        modified: PathBuf,
+        /// Optional path to export declarative JSON patch recipe.
+        #[arg(long)]
+        out_recipe: Option<PathBuf>,
+        /// Output structured JSON diff report.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Apply or reverse a declarative JSON patch recipe against a target binary file.
+    ApplyRecipe {
+        /// Target binary file path to patch.
+        file: PathBuf,
+        /// Path to declarative JSON patch recipe file.
+        recipe: PathBuf,
+        /// Perform dry-run verification without writing changes to disk.
+        #[arg(long)]
+        dry_run: bool,
+        /// Reverse the patch operations (swap expected and replacement bytes).
+        #[arg(long)]
+        reverse: bool,
+        /// Create a `.bak` backup file prior to applying modifications.
+        #[arg(long)]
+        backup: bool,
+        /// Output structured JSON apply report.
+        #[arg(long)]
+        json: bool,
+    },
 }
