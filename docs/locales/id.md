@@ -123,6 +123,10 @@ bsentinel rich sample.exe --json
 # 15. Brute-force single/multi-byte XOR, ADD & ROL deobfuscation to uncover hidden IoCs and headers
 bsentinel xor-scan sample.exe
 bsentinel xor-scan sample.exe --json
+
+# 16. Inspect PE Resource Directory (.rsrc), extract manifest, UAC execution levels & version info
+bsentinel resources sample.exe
+bsentinel resources sample.exe --json
 ```
 
 </details>
@@ -158,6 +162,7 @@ bin-sentinel/
 │   ├── rules/                     # Declarative YARA-style hex signature, nibble wildcard & byte jump scanner
 │   ├── rich/                      # PE Rich header decoder, MSVC compiler toolchain fingerprinter & checksum validator
 │   ├── deobfuscate/               # Single/multi-byte XOR, ADD & ROL deobfuscation scanner & key recovery
+│   ├── resources/                 # PE 3-level resource directory (.rsrc), application manifest & version info parser
 │   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
 │   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
 │   ├── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
@@ -172,7 +177,8 @@ bin-sentinel/
 │   ├── rules_test.rs              # Integration tests for YARA-style hex wildcards, jumps, strings & JSON rule sets
 │   ├── diff_test.rs               # Integration tests for structural diffing, patch recipes & atomic reversal
 │   ├── rich_test.rs               # Integration tests for PE Rich header decoding, toolchain fingerprinting & checksums
-│   └── deobfuscate_test.rs        # Integration tests for XOR/ADD/ROL deobfuscation, crib dragging & payload classifiers
+│   ├── deobfuscate_test.rs        # Integration tests for XOR/ADD/ROL deobfuscation, crib dragging & payload classifiers
+│   └── resources_test.rs          # Integration tests for PE resource directory tree, UAC manifest & version info
 └── docs/
     ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
     └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams

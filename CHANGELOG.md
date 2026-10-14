@@ -5,6 +5,34 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-10-14
+
+### Added
+- PE Resource Directory (`.rsrc`), application manifest, and UAC privilege extractor (`src/resources/`):
+  - Zero-dependency 3-level PE resource directory tree traversal (`parser.rs`):
+    - Traversal across Level 1 (Resource Types), Level 2 (Names and IDs), and Level 3 (Languages and Locales) down to `IMAGE_RESOURCE_DATA_ENTRY` leaves.
+    - Resource identifier resolution mapping standard Windows types (`RT_MANIFEST`, `RT_VERSION`, `RT_ICON`, `RT_GROUP_ICON`, `RT_RCDATA`, `RT_BITMAP`, `RT_STRING`, `RT_DIALOG`, `RT_HTML`, etc.) and UTF-16LE named resource strings (`IMAGE_RESOURCE_DIR_STRING_U`).
+    - Standard Windows language code decoding (`0x0409` English US, `0x0412` Korean, `0x0000` Neutral, `0x0804` Chinese, etc.).
+    - Circular reference loop protection (`HashSet` tracking of visited directory offsets) and recursion depth bounding preventing denial-of-service on cyclic or corrupted resource tables.
+  - Application manifest (`RT_MANIFEST`) extraction and privilege level analyzer (`manifest.rs`):
+    - Transparent string decoding handling UTF-8, UTF-16LE, and UTF-16BE with Byte Order Mark (BOM) normalization.
+    - Extraction of User Account Control (UAC) `requestedExecutionLevel` (`requireAdministrator`, `highestAvailable`, `asInvoker`).
+    - Detection of accessibility UI access bypass (`uiAccess="true"`).
+    - Detection of UAC prompt bypass declarations (`<autoElevate>true</autoElevate>`).
+    - Extraction of assembly identity metadata (`name`, `version`, `processorArchitecture`).
+    - Automated security alert generation when administrative privilege elevation or auto-elevation is detected.
+  - Windows Version Information (`RT_VERSION`) parser (`version.rs`):
+    - `VS_VERSIONINFO` header parsing and `VS_FIXEDFILEINFO` 32-bit field unpacking (`dwFileVersionMS`, `dwFileVersionLS`, `dwProductVersionMS`, `dwProductVersionLS`).
+    - Fallback UTF-16 StringTable property extractor recovering `CompanyName`, `FileDescription`, `FileVersion`, `InternalName`, `LegalCopyright`, `OriginalFilename`, `ProductName`, and `ProductVersion`.
+  - High-entropy resource blob detection (`parser.rs`):
+    - Per-resource Shannon entropy calculation isolating compressed, encrypted, or packed blobs (threshold >= 7.20 in payloads >= 512 bytes).
+    - Automated forensic alert generation highlighting potential dropper stages, encrypted shellcode, or embedded container payloads.
+  - Deterministic synthetic PE resource builder (`synthetic.rs`):
+    - `build_synthetic_resource_pe` supporting customizable UAC execution levels, autoElevate tags, version properties, and high-entropy RCDATA payload generation for reliable offline testing.
+  - CLI subcommand:
+    - `bsentinel resources <file> [--json]`: formatted terminal tables displaying resource counts, type breakdown, manifest configuration, version strings, and high-entropy anomalies, alongside structured machine-readable JSON telemetry.
+  - Comprehensive integration test suite (`tests/resources_test.rs`) covering clean binaries without resources, synthetic 3-level tree verification, UAC `requireAdministrator` and `asInvoker` detection, high-entropy RCDATA detection, version property extraction, malformed/truncated resource resilience, and end-to-end CLI JSON and table execution.
+
 ## [0.11.0] - 2026-10-13
 
 ### Added

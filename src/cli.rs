@@ -204,4 +204,12 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Parse 3-level PE resource directory (.rsrc), extract application manifest, UAC execution levels, and version strings.
+    Resources {
+        /// Target PE binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }
