@@ -5,6 +5,29 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-10-14
+
+### Added
+- PE TLS Callback Directory & Exception Unwind (`.pdata`) Analyzer (`src/callbacks/`):
+  - Zero-dependency PE TLS Directory (`IMAGE_DIRECTORY_ENTRY_TLS`) parser (`tls.rs`):
+    - Full support for both 64-bit (`IMAGE_TLS_DIRECTORY64`, 40 bytes) and 32-bit (`IMAGE_TLS_DIRECTORY32`, 24 bytes) structures.
+    - Endian-safe extraction of raw template boundaries (`StartAddressOfRawData`, `EndAddressOfRawData`), `AddressOfIndex`, and `AddressOfCallBacks`.
+    - Bidirectional Virtual Address (VA) to Relative Virtual Address (RVA) resolution against image base and section table boundaries.
+    - Safe sequential traversal of null-terminated callback pointer arrays bounded by `MAX_TLS_CALLBACKS` (256 entries).
+    - Section and permission mapping resolving whether callbacks reside in executable, writable, or anomalous Read-Write-Execute (`RWX`) segments.
+    - Automated forensic alert generation flagging pre-main execution hooks, non-standard section targets, and stealth loader indicators.
+  - x64 Exception Directory (`IMAGE_DIRECTORY_ENTRY_EXCEPTION` / `.pdata`) parser (`unwind.rs`):
+    - Table-based structured exception handling parser iterating 12-byte `RUNTIME_FUNCTION` entries (`begin_rva`, `end_rva`, `unwind_info_rva`).
+    - Bounded iteration up to 4,096 functions with table truncation alerts.
+    - Integrity checks detecting inverted or zero function spans (`end_rva <= begin_rva`) and unmapped function addresses.
+    - `UNWIND_INFO` structure decoder unpacking version, prolog size, frame register/offset, and unwind flags (`UNW_FLAG_NHANDLER`, `UNW_FLAG_EHANDLER`, `UNW_FLAG_UHANDLER`, `UNW_FLAG_CHAININFO`).
+    - Custom exception handler and termination handler RVA resolution with section permission auditing to detect handlers pointing into anomalous RWX or non-executable memory.
+  - Deterministic synthetic PE builder (`synthetic.rs`):
+    - `build_synthetic_callbacks_pe` generating valid PE32+ binaries with customizable TLS directories, callback pointer arrays, and `.pdata` exception tables with handlers for offline automated testing.
+  - CLI subcommand:
+    - `bsentinel callbacks <file> [--json]`: formatted terminal tables displaying TLS directory metadata, callback execution hooks, and runtime function exception handlers alongside structured machine-readable JSON output.
+  - Comprehensive integration test suite (`tests/callbacks_test.rs`) covering clean binaries, valid TLS callbacks, exception tables with handlers, RWX execution anomalies, inverted function spans, unmapped handlers, multi-callback arrays, malformed inputs, real Windows binaries, and CLI JSON execution.
+
 ## [0.12.0] - 2026-10-14
 
 ### Added

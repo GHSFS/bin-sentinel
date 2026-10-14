@@ -3,6 +3,7 @@
 // Copyright 2026 GHSFS. See the NOTICE file for attribution details.
 
 pub mod authenticode;
+pub mod callbacks;
 pub mod diff;
 pub mod forensics;
 pub mod inspect;
@@ -69,5 +70,6 @@ pub fn dispatch(command: Commands) -> Result<()> {
         Commands::Rich { file, json } => rich::handle_rich(&file, json),
         Commands::XorScan { file, json } => forensics::handle_xor_scan(&file, json),
         Commands::Resources { file, json } => resources::handle_resources(&file, json),
+        Commands::Callbacks { file, json } => callbacks::handle_callbacks(&file, json),
     }
 }

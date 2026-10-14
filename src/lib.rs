@@ -3,6 +3,7 @@
 // Copyright 2026 GHSFS. See the NOTICE file for attribution details.
 
 pub mod authenticode;
+pub mod callbacks;
 pub mod cli;
 pub mod commands;
 pub mod crypto_scan;

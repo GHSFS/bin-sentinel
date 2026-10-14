@@ -212,4 +212,12 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Parse PE TLS callback directory and x64 exception unwind (.pdata) tables to detect pre-main hooks and abnormal handlers.
+    Callbacks {
+        /// Target PE binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }
