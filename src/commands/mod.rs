@@ -4,6 +4,7 @@
 
 pub mod authenticode;
 pub mod callbacks;
+pub mod carve;
 pub mod diff;
 pub mod forensics;
 pub mod inspect;
@@ -71,5 +72,11 @@ pub fn dispatch(command: Commands) -> Result<()> {
         Commands::XorScan { file, json } => forensics::handle_xor_scan(&file, json),
         Commands::Resources { file, json } => resources::handle_resources(&file, json),
         Commands::Callbacks { file, json } => callbacks::handle_callbacks(&file, json),
+        Commands::Carve {
+            file,
+            min_len,
+            extract_dir,
+            json,
+        } => carve::handle_carve(&file, min_len, extract_dir.as_deref(), json),
     }
 }

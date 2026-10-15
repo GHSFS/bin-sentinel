@@ -5,6 +5,32 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-10-15
+
+### Added
+- Base64, Hex & Encoded Payload Carve & Decode Engine (`src/carve/`):
+  - Zero-dependency RFC 4648 Base64 & URL-Safe Base64 scanner and decoder (`base64.rs`):
+    - Streaming candidate hunter scanning both ASCII and UTF-16LE wide-character byte streams (e.g. PowerShell dropper commands).
+    - Configurable minimum length filter (`min_length`, default: 16) and degenerate/zero-padding heuristic rejection.
+  - Multi-format Hex candidate scanner and decoder (`hex.rs`):
+    - Contiguous hex stream detector (`[0-9a-fA-F]{24,}`) with hex letter distribution validation to prevent false positives on decimal numbers.
+    - Formatted hex sequence detector supporting C/Python/ASM escaped hex (`\x4d\x5a\x90...`), comma/0x sequences (`0x4d, 0x5a...`), and space/colon/dash-separated byte pairs.
+  - Heuristic payload classifier and confidence scoring engine (`classifier.rs`):
+    - Magic header identification for nested executables: PE32/PE32+ (`MZ` + `PE\0\0`, architecture, DLL/EXE flag), Linux ELF32/ELF64 (`\x7FELF`), and Apple Mach-O (64-bit, 32-bit, Universal Fat).
+    - Archive and document container detection: ZIP/APK/Office (`PK\x03\x04`), GZIP (`\x1F\x8B`), 7-Zip (`7z\xBC\xAF\x27\x1C`), and Adobe PDF (`%PDF-`).
+    - Embedded script syntax detection: PowerShell cradle keywords (`invoke-expression`, `downloadstring`, `start-process`, `bypass`), Unix Shell scripts (`#!/bin/`, `curl`, `wget`, `chmod +x`, `bash -i`), and Windows Batch scripts (`@echo off`, `certutil -decode`, `bitsadmin`).
+    - Network IoC extraction: HTTP/HTTPS/FTP URLs and IPv4 addresses.
+    - High-entropy shellcode detection (entropy >= 6.80 with x86/x64 prologues, NOP sleds, or syscall stubs).
+    - Objective confidence scoring (0..=100) and automatic preview hex/text generation.
+  - High-level orchestrator and safe extraction pipeline (`mod.rs`):
+    - Section and RVA mapping against parent PE, ELF, and Mach-O container binaries with Read-Write-Execute (`RWX`) anomaly alerting.
+    - Multi-candidate disambiguation prioritizing higher-confidence interpretations on offset collisions.
+    - Safe payload extraction (`--extract-dir <dir>`) with strict path traversal defenses (`dest.starts_with(out_dir)`) and extension deduction (`.exe`, `.elf`, `.ps1`, `.sh`, `.zip`, etc.).
+  - CLI subcommand:
+    - `bsentinel carve <file> [--min-len <n>] [--extract-dir <dir>] [--json]`: human-readable terminal table rendering with color-coded previews, RWX section alerts, and structured machine-readable JSON output.
+  - Comprehensive integration test suite (`tests/carve_test.rs`):
+    - 10 integration test cases covering Base64 nested PE extraction, URL-safe Base64 PowerShell cradles, contiguous hex streams, formatted hex variants, UTF-16LE encoded commands, PE section/RWX mapping, directory extraction, noise/false-positive rejection, malformed/truncated resilience, and CLI execution.
+
 ## [0.13.0] - 2026-10-14
 
 ### Added

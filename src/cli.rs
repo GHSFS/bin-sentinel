@@ -220,4 +220,18 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Detect, decode, and score embedded Base64, URL-safe Base64, and hex-encoded payloads.
+    Carve {
+        /// Target binary file or script path.
+        file: PathBuf,
+        /// Minimum length of encoded string to carve (default: 16).
+        #[arg(long, default_value = "16")]
+        min_len: usize,
+        /// Optional directory to safely extract decoded payloads to disk.
+        #[arg(long)]
+        extract_dir: Option<PathBuf>,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }

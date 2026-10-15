@@ -4,6 +4,7 @@
 
 pub mod authenticode;
 pub mod callbacks;
+pub mod carve;
 pub mod cli;
 pub mod commands;
 pub mod crypto_scan;

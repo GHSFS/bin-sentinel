@@ -131,6 +131,10 @@ bsentinel resources sample.exe --json
 # 17. Inspect PE TLS callbacks, pre-main execution hooks & x64 exception unwind (.pdata) tables
 bsentinel callbacks sample.exe
 bsentinel callbacks sample.exe --json
+
+# 18. Carve and decode embedded Base64, URL-safe Base64 & hex payloads with safe extraction
+bsentinel carve sample.exe
+bsentinel carve sample.exe --extract-dir ./extracted_payloads --json
 ```
 
 </details>
@@ -155,8 +159,8 @@ bin-sentinel/
 ├── src/
 │   ├── lib.rs                     # Library module exports
 │   ├── main.rs                    # Streamlined CLI entry point dispatching to commands
-│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, scan-code, rule-scan, rich, xor-scan, etc.)
-│   ├── commands/                  # Modular CLI subcommands (inspect, forensics, rules, diff, authenticode, macho, rich)
+│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, scan-code, rule-scan, rich, xor-scan, carve, etc.)
+│   ├── commands/                  # Modular CLI subcommands (inspect, forensics, rules, diff, authenticode, macho, rich, callbacks, carve)
 │   ├── error.rs                   # Unified SentinelError & Result<T>
 │   ├── pe.rs                      # Zero-dependency PE32/PE32+ header & section parser + synthetic PE64 builder
 │   ├── elf/                       # Zero-dependency Linux/BSD ELF64 parser (headers, mod, synthetic builder)
@@ -168,6 +172,7 @@ bin-sentinel/
 │   ├── deobfuscate/               # Single/multi-byte XOR, ADD & ROL deobfuscation scanner & key recovery
 │   ├── resources/                 # PE 3-level resource directory (.rsrc), application manifest & version info parser
 │   ├── callbacks/                 # PE TLS callbacks, pre-main hooks & x64 .pdata exception unwind tables
+│   ├── carve/                     # Base64, URL-safe Base64 & hex payload carving, decoding & classification
 │   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
 │   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
 │   ├── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
@@ -178,6 +183,7 @@ bin-sentinel/
 │   ├── elf_test.rs                # Integration tests for ELF64 parsing, PIE/RELRO/NX mitigations & dynamic symbols
 │   ├── crypto_scan_test.rs        # Integration tests for cryptographic constants, S-Boxes & PE/ELF section mapping
 │   ├── imports_test.rs            # Integration tests for PE IAT/EAT tables, imphash & dynamic API hash resolution
+│   ├── carve_test.rs              # Integration tests for Base64/Hex carving, PowerShell cradles, safe extraction & CLI
 │   ├── disasm_test.rs             # Integration tests for x86_64 prologues, direct syscalls & anti-debug checks
 │   ├── rules_test.rs              # Integration tests for YARA-style hex wildcards, jumps, strings & JSON rule sets
 │   ├── diff_test.rs               # Integration tests for structural diffing, patch recipes & atomic reversal
