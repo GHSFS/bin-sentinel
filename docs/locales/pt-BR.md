@@ -6,14 +6,14 @@
 </p>
 
 <p align="center">
-  <img src="../assets/locales/pt-BR/banner.svg" alt="BinSentinel (bsentinel) banner" width="100%" />
+  <img src="../assets/locales/pt-BR/banner.svg" alt="Banner do BinSentinel (bsentinel)" width="100%" />
 </p>
 
 <div align="center">
 
 # 🛡️ BinSentinel (bsentinel)
 
-**Forense Binária Zero-Dependência, Analisador Estático PE/ELF, Detector de Entropia e Patching de Bytes**
+**Análise forense de binários sem dependências, analisador estático PE/ELF, detector de entropia de empacotadores e kit declarativo de patches de bytes**
 
 [![CI](https://github.com/GHSFS/bin-sentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/GHSFS/bin-sentinel/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../../LICENSE)
@@ -24,123 +24,123 @@
 
 ---
 
-## 🔍 Visão Geral
+## 🔍 Visão geral
 
 <details open>
-<summary><b>🔍 Visão Geral</b></summary>
+<summary><b>🔍 Visão geral</b></summary>
 <br>
 
-O bin-sentinel (bsentinel) é um kit de ferramentas de linha de comando em binário único escrito em Rust 100% seguro para análise estática de executáveis, triagem de engenharia reversa e aplicação declarativa de patches de bytes.
+bin-sentinel (bsentinel) é um conjunto de ferramentas em binário único para análise estática de executáveis, triagem de engenharia reversa e aplicação declarativa de patches de bytes, escrito em Rust 100% seguro. Projetado para analistas de segurança, pesquisadores de malware e engenheiros de sistemas que necessitam de inspeção rápida e determinística de binários não confiáveis sem dependências externas de tempo de execução.
 
 </details>
 
 ---
 
-## 🏛️ Arquitetura Principal e Pipeline de Inspeção
+## 🏛️ Arquitetura central e pipeline de análise
 
 <details open>
-<summary><b>🏛️ Arquitetura Principal e Pipeline de Inspeção</b></summary>
+<summary><b>🏛️ Arquitetura central e pipeline de análise</b></summary>
 <br>
 
 <p align="center">
-  <img src="../assets/locales/pt-BR/architecture.svg" alt="Arquitetura Principal e Pipeline de Inspeção" width="100%" />
+  <img src="../assets/locales/pt-BR/architecture.svg" alt="Arquitetura central e pipeline de análise" width="100%" />
 </p>
 
-| # | Módulo | Arquivo Fonte | Capacidade Principal e Invariante de Segurança |
+| # | Nome do módulo | Arquivo fonte | Capacidade principal e invariante de segurança |
 |---|---|---|---|
-| **01** | **Parser Estático PE32/PE32+** | `src/pe.rs` | Análise com verificação de limites para cabeçalhos DOS/COFF/Optional, flags ASLR/DEP/CFG e anomalias RWX |
-| **02** | **Entropia e Heurística de Packers** | `src/entropy.rs` | Entropia de Shannon (0..8 bits/B), uniformidade Qui-Quadrado e detecção de UPX/VMProtect/Themida |
-| **03** | **Scanner de Strings e IoCs** | `src/strings.rs` | Extrai strings ASCII e UTF-16LE e classifica URLs, IPv4, chaves de registro e APIs Win32 |
-| **04** | **Motor de Patch Declarativo** | `src/patch.rs` | Verificação em tempo constante dos bytes esperados, hashes SHA-256 pré/pós-patch, backup .bak e Zeroize |
-| **05** | **CLI Estruturada e Motor JSON** | `src/cli.rs` | Construtor determinístico de PE64 sintético e saída --json legível por máquina para pipelines CI |
+| **01** | **Analisador estático PE32/PE32+** | `src/pe.rs` | Análise com verificação rigorosa de limites para cabeçalhos DOS/COFF/Opcionais, mitigações ASLR/DEP/CFG e anomalias RWX |
+| **02** | **Entropia e heurística de empacotadores** | `src/entropy.rs` | Entropia de Shannon (0..8 bits/B), teste de uniformidade Qui-quadrado e detecção de UPX/VMProtect/Themida |
+| **03** | **Scanner de strings estáticas e IoC** | `src/strings.rs` | Extração de strings ASCII e UTF-16LE com classificação de URLs, IPv4, chaves de registro e APIs críticas do Win32 |
+| **04** | **Aplicador declarativo de patches de bytes** | `src/patch.rs` | Verificação em tempo constante de bytes esperados, resumos SHA-256 pré/pós patch, backup .bak e limpeza Zeroize |
+| **05** | **CLI estruturada e motor JSON** | `src/cli.rs` | Gerador determinístico de PE64 para testes (synth-pe) e saída legível por máquina --json para pipelines de CI |
 
 </details>
 
 ---
 
-## ⚡ Início Rápido e Uso da CLI
+## ⚡ Início rápido e comandos da CLI
 
 <details open>
-<summary><b>⚡ Início Rápido e Uso da CLI</b></summary>
+<summary><b>⚡ Início rápido e comandos da CLI</b></summary>
 <br>
 
 ```bash
-# 1. Build release binary
+# 1. Compilar o binário otimizado para produção
 cargo build --release
 
-# 2. Generate a deterministic synthetic PE32+ (64-bit) test binary
+# 2. Gerar um executável de teste sintético determinístico PE32+ (64 bits)
 bsentinel synth-pe sample.exe
 
-# 3. Inspect PE headers, ASLR/DEP/CFG mitigations, section table & packer heuristics
+# 3. Inspecionar cabeçalhos PE, mitigações ASLR/DEP/CFG, tabela de seções e heurística de empacotadores
 bsentinel inspect sample.exe
 bsentinel inspect sample.exe --json
 
-# 4. Generate and inspect a deterministic synthetic Linux/BSD ELF64 binary
+# 4. Gerar e inspecionar um binário sintético determinístico Linux/BSD ELF64
 bsentinel synth-elf sample.elf
 bsentinel inspect-elf sample.elf
 bsentinel inspect-elf sample.elf --json
 
-# 5. Run statistical Shannon entropy & Chi-square uniformity analysis
+# 5. Executar análise estatística de entropia de Shannon e uniformidade Qui-quadrado
 bsentinel entropy sample.exe --window 512
 bsentinel entropy sample.exe --window 512 --json
 
-# 6. Extract printable ASCII & UTF-16LE strings and filter Indicators of Compromise (IoCs)
+# 6. Extrair strings imprimíveis ASCII e UTF-16LE e filtrar indicadores de comprometimento (IoC)
 bsentinel strings sample.exe --min-len 4
 bsentinel strings sample.exe --ioc-only --json
 
-# 7. Scan binary for embedded cryptographic constants, AES S-Boxes, SHA/ChaCha20 keys & CRC tables
+# 7. Escanear o binário em busca de constantes criptográficas, S-Boxes AES, chaves SHA/ChaCha20 e tabelas CRC
 bsentinel crypto-scan sample.exe
 bsentinel crypto-scan sample.exe --json
 
-# 8. Inspect PE Import/Export tables (IAT/EAT), compute imphash & resolve dynamic API hashes
+# 8. Inspecionar tabelas de importação/exportação PE (IAT/EAT), calcular imphash e resolver hashes dinâmicos de API
 bsentinel imports sample.exe
 bsentinel imports sample.exe --resolve-hash 0x0726774C --json
 
-# 9. Apply a verified declarative byte patch with expected-byte check and .bak backup
+# 9. Aplicar patch de bytes declarativo verificado com validação de bytes esperados e backup .bak
 bsentinel patch sample.exe --offset 0x200 --expect 4883EC28 --replace 90909090 --backup --json
 
-# 10. Scan x86_64 prologues, direct syscalls, RDTSC anti-debug & CPUID checks
+# 10. Escanear prólogos x86_64, chamadas diretas de sistema (Direct Syscalls), verificações antidebug RDTSC e CPUID
 bsentinel scan-code sample.exe
 bsentinel scan-code sample.exe --json
 
-# 11. Scan declarative YARA-style hex signatures with wildcards, byte jumps & JSON rules
+# 11. Escanear assinaturas hexadecimais declarativas no estilo YARA com curingas, saltos de bytes e regras JSON
 bsentinel rule-scan sample.exe --pattern "48 83 EC ?? [2-6] E8"
 bsentinel rule-scan sample.exe --rules rules.json --json
 
-# 12. Compare two binaries structurally and export a declarative JSON patch recipe
+# 12. Comparar dois binários estruturalmente e exportar receita declarativa de patch em JSON
 bsentinel diff baseline.exe modified.exe --out-recipe patch.json
 bsentinel diff baseline.exe modified.exe --json
 
-# 13. Apply or reverse a declarative patch recipe with dry-run verification and backup
+# 13. Aplicar ou reverter uma receita declarativa de patch com simulação prévia (dry-run) e backup
 bsentinel apply-recipe baseline.exe patch.json --dry-run
 bsentinel apply-recipe baseline.exe patch.json --backup
 bsentinel apply-recipe baseline.exe patch.json --reverse
 
-# 14. Decode PE Rich header, fingerprint Visual Studio toolchains & verify 32-bit checksum
+# 14. Decodificar cabeçalho PE Rich, identificar toolchains do Visual Studio e verificar checksum de 32 bits
 bsentinel rich sample.exe
 bsentinel rich sample.exe --json
 
-# 15. Brute-force single/multi-byte XOR, ADD & ROL deobfuscation to uncover hidden IoCs and headers
+# 15. Aplicar força bruta em desofuscação XOR, ADD e ROL de um ou múltiplos bytes para revelar IoCs e cabeçalhos
 bsentinel xor-scan sample.exe
 bsentinel xor-scan sample.exe --json
 
-# 16. Inspect PE Resource Directory (.rsrc), extract manifest, UAC execution levels & version info
+# 16. Inspecionar diretório de recursos PE (.rsrc), extrair manifesto, níveis de execução UAC e versão
 bsentinel resources sample.exe
 bsentinel resources sample.exe --json
 
-# 17. Inspect PE TLS callbacks, pre-main execution hooks & x64 exception unwind (.pdata) tables
+# 17. Inspecionar callbacks TLS de PE, ganchos de execução pré-main e tabelas de desenrolamento x64 (.pdata)
 bsentinel callbacks sample.exe
 bsentinel callbacks sample.exe --json
 
-# 18. Carve and decode embedded Base64, URL-safe Base64 & hex payloads with safe extraction
+# 18. Extrair e decodificar com segurança cargas úteis incorporadas em Base64, URL-Safe Base64 e hexadecimal
 bsentinel carve sample.exe
 bsentinel carve sample.exe --extract-dir ./extracted_payloads --json
 
-# 19. Compute rolling-hash piecewise fuzzy similarity digest (CTPH / SSDEEP) and section fingerprints
+# 19. Calcular resumo de similaridade difusa por blocos de hash rolante (CTPH / SSDEEP) e impressões de seções
 bsentinel fuzzy-hash sample.exe
 bsentinel fuzzy-hash sample.exe --json
 
-# 20. Compare binary artifacts and correlate section-by-section fuzzy similarity scores (0..=100)
+# 20. Comparar artefatos binários e correlacionar pontuações de similaridade difusa seção por seção (0..=100)
 bsentinel fuzzy-compare original.exe modified.exe
 bsentinel fuzzy-compare original.exe modified.exe --json
 ```
@@ -149,89 +149,89 @@ bsentinel fuzzy-compare original.exe modified.exe --json
 
 ---
 
-## 📦 Estrutura do Repositório
+## 📦 Estrutura do repositório e árvore de fontes
 
 <details open>
-<summary><b>📦 Estrutura do Repositório</b></summary>
+<summary><b>📦 Estrutura do repositório e árvore de fontes</b></summary>
 <br>
 
 ```text
 bin-sentinel/
-├── Cargo.toml                     # Pure-Rust package manifest (bsentinel binary + bin_sentinel lib)
-├── README.md                      # Root English documentation with 10-language navigation
-├── ROADMAP.md                     # Public engineering roadmap
-├── CHANGELOG.md                   # Keep-a-Changelog release history
-├── SECURITY.md                    # Binary parsing & memory safety policy
-├── LICENSE                        # Apache License 2.0
-├── NOTICE                         # Attribution notice owned by GHSFS
+├── Cargo.toml                     # Manifesto do pacote em Rust puro (binário bsentinel e biblioteca bin_sentinel)
+├── README.md                      # Documentação raiz em inglês com navegação em 10 idiomas
+├── ROADMAP.md                     # Roteiro público de engenharia e desenvolvimento
+├── CHANGELOG.md                   # Histórico de versões mantido sob padrão Keep-a-Changelog
+├── SECURITY.md                    # Análise de binários e política de segurança de memória
+├── LICENSE                        # Licença Apache 2.0
+├── NOTICE                         # Aviso de atribuição e direitos autorais pertencente à GHSFS
 ├── src/
-│   ├── lib.rs                     # Library module exports
-│   ├── main.rs                    # Streamlined CLI entry point dispatching to commands
-│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, scan-code, rule-scan, rich, xor-scan, carve, etc.)
-│   ├── commands/                  # Modular CLI subcommands (inspect, forensics, rules, diff, authenticode, macho, rich, callbacks, carve, fuzzy)
-│   ├── error.rs                   # Unified SentinelError & Result<T>
-│   ├── pe.rs                      # Zero-dependency PE32/PE32+ header & section parser + synthetic PE64 builder
-│   ├── elf/                       # Zero-dependency Linux/BSD ELF64 parser (headers, mod, synthetic builder)
-│   ├── imports/                   # PE Import/Export (IAT/EAT) parser, RFC 1321 MD5 imphash & dynamic API hash resolver
-│   ├── crypto_scan/               # Embedded cryptographic primitives, AES/SM4 S-Boxes & hash constants scanner
-│   ├── disasm/                    # x86_64 prologue/epilogue, direct syscalls & control-flow pattern scanner
-│   ├── rules/                     # Declarative YARA-style hex signature, nibble wildcard & byte jump scanner
-│   ├── rich/                      # PE Rich header decoder, MSVC compiler toolchain fingerprinter & checksum validator
-│   ├── deobfuscate/               # Single/multi-byte XOR, ADD & ROL deobfuscation scanner & key recovery
-│   ├── resources/                 # PE 3-level resource directory (.rsrc), application manifest & version info parser
-│   ├── callbacks/                 # PE TLS callbacks, pre-main hooks & x64 .pdata exception unwind tables
-│   ├── carve/                     # Base64, URL-safe Base64 & hex payload carving, decoding & classification
-│   ├── fuzzy_hash/                # CTPH rolling hash engine, dual block size scaling & binary similarity compare
-│   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
-│   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
-│   ├── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
-│   └── diff/                      # Structural binary diffing & declarative patch recipe engine
+│   ├── lib.rs                     # Exportações da interface pública da biblioteca
+│   ├── main.rs                    # Ponto de entrada enxuto da CLI com despacho de comandos
+│   ├── cli.rs                     # Definições de subcomandos e argumentos derivados do Clap (inspect, imports, rich, etc.)
+│   ├── commands/                  # Manipuladores modulares de subcomandos da CLI (inspect, forensics, rules, diff, rich, etc.)
+│   ├── error.rs                   # Modelo unificado de erros SentinelError e Result<T>
+│   ├── pe.rs                      # Analisador sem dependências de cabeçalhos/seções PE32/PE32+ e gerador PE64
+│   ├── elf/                       # Analisador sem dependências de binários Linux/BSD ELF64 (cabeçalhos, módulos, gerador)
+│   ├── imports/                   # Analisador de importação/exportação PE (IAT/EAT), imphash MD5 e resolução de hashes de API
+│   ├── crypto_scan/               # Scanner de primitivas criptográficas, S-Boxes AES/SM4 e constantes de dispersão
+│   ├── disasm/                    # Scanner de prólogos/epílogos x86_64, chamadas diretas ao sistema e padrões de controle
+│   ├── rules/                     # Scanner declarativo estilo YARA de assinaturas hexadecimais, curingas e saltos
+│   ├── rich/                      # Decodificador de cabeçalho PE Rich, identificador de toolchains MSVC e validador de checksum
+│   ├── deobfuscate/               # Scanner de desofuscação XOR, ADD e ROL de um/múltiplos bytes e recuperação de chaves
+│   ├── resources/                 # Analisador de recursos PE de 3 níveis (.rsrc), manifesto e informações de versão
+│   ├── callbacks/                 # Callbacks TLS de PE, ganchos pré-main e tabelas .pdata de desenrolamento de exceções x64
+│   ├── carve/                     # Extração, decodificação e classificação de cargas úteis Base64, URL-Safe Base64 e hex
+│   ├── fuzzy_hash/                # Motor de hash rolante CTPH, escalonamento duplo de bloco e comparação de similaridade
+│   ├── entropy.rs                 # Entropia de Shannon, teste de uniformidade Qui-quadrado e detector de empacotadores
+│   ├── strings.rs                 # Extrator de strings ASCII e UTF-16LE + classificador automático de IoCs
+│   ├── patch.rs                   # Motor de patches de bytes verificado em tempo constante com SHA-256 e Zeroize
+│   └── diff/                      # Comparação estrutural de binários e motor de receitas declarativas de patches
 ├── tests/
-│   ├── pe_entropy_test.rs         # Integration tests for PE64 parsing, mitigations, entropy & CLI JSON
-│   ├── patch_strings_test.rs      # Integration tests for IoC extraction, verified patching & backups
-│   ├── elf_test.rs                # Integration tests for ELF64 parsing, PIE/RELRO/NX mitigations & dynamic symbols
-│   ├── crypto_scan_test.rs        # Integration tests for cryptographic constants, S-Boxes & PE/ELF section mapping
-│   ├── imports_test.rs            # Integration tests for PE IAT/EAT tables, imphash & dynamic API hash resolution
-│   ├── carve_test.rs              # Integration tests for Base64/Hex carving, PowerShell cradles, safe extraction & CLI
-│   ├── disasm_test.rs             # Integration tests for x86_64 prologues, direct syscalls & anti-debug checks
-│   ├── rules_test.rs              # Integration tests for YARA-style hex wildcards, jumps, strings & JSON rule sets
-│   ├── diff_test.rs               # Integration tests for structural diffing, patch recipes & atomic reversal
-│   ├── rich_test.rs               # Integration tests for PE Rich header decoding, toolchain fingerprinting & checksums
-│   ├── deobfuscate_test.rs        # Integration tests for XOR/ADD/ROL deobfuscation, crib dragging & payload classifiers
-│   ├── resources_test.rs          # Integration tests for PE resource directory tree, UAC manifest & version info
-│   ├── callbacks_test.rs          # Integration tests for TLS callbacks, pre-main alerts, pdata tables & exception handlers
-│   ├── fuzzy_hash_test.rs         # Integration tests for CTPH fuzzy hashing, Levenshtein distance & binary comparison
+│   ├── pe_entropy_test.rs         # Testes de análise PE64, mitigações, entropia e saída JSON da CLI
+│   ├── patch_strings_test.rs      # Testes de extração de IoCs, aplicação verificada de patches e backups
+│   ├── elf_test.rs                # Testes de análise ELF64, mitigações PIE/RELRO/NX e símbolos dinâmicos
+│   ├── crypto_scan_test.rs        # Testes de constantes criptográficas, S-Boxes e mapeamento de seções PE/ELF
+│   ├── imports_test.rs            # Testes de tabelas PE IAT/EAT, cálculo de imphash e resolução de hashes de API
+│   ├── carve_test.rs              # Testes de extração Base64/Hex, armadilhas PowerShell e despejo seguro
+│   ├── disasm_test.rs             # Testes de prólogos x86_64, chamadas diretas de sistema e testes antidebug
+│   ├── rules_test.rs              # Testes de curingas hexadecimais estilo YARA, saltos, strings e regras JSON
+│   ├── diff_test.rs               # Testes de comparação estrutural, receitas de patches e reversão atômica
+│   ├── rich_test.rs               # Testes de decodificação de cabeçalho PE Rich, impressões de toolchains e checksum
+│   ├── deobfuscate_test.rs        # Testes de desofuscação XOR/ADD/ROL, arrasto de texto conhecido e classificação
+│   ├── resources_test.rs          # Testes da árvore de diretórios de recursos PE, manifesto UAC e metadados
+│   ├── callbacks_test.rs          # Testes de callbacks TLS, alertas pré-main, tabelas pdata e tratadores de exceção
+│   ├── fuzzy_hash_test.rs         # Testes de hash difuso CTPH, distância Levenshtein e comparação de binários
 └── docs/
-    ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
-    └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams
+    ├── locales/                   # Documentação traduzida para vários idiomas (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
+    └── assets/locales/            # Banners SVG auto-hospedados e diagramas de arquitetura localizados
 ```
 
 </details>
 
 ---
 
-## 🔒 Segurança de Memória e Garantias
+## 🔒 Segurança de memória e invariantes de proteção
 
 <details open>
-<summary><b>🔒 Segurança de Memória e Garantias</b></summary>
+<summary><b>🔒 Segurança de memória e invariantes de proteção</b></summary>
 <br>
 
-- 🛡️ Zero blocos unsafe em todos os analisadores binários; leituras verificadas contra overflow.
-- 🛡️ Comparação de bytes em tempo constante (constant_time_eq) antes de aplicar qualquer modificação.
-- 🛡️ Trilha de auditoria criptográfica com resumos SHA-256 antes e depois do patch.
-- 🛡️ Limpeza imediata de buffers de trabalho na memória via zeroize.
+- 🛡️ Zero blocos `unsafe` em todos os analisadores de cabeçalhos binários: cada leitura de deslocamento e fatia utiliza aritmética com checagem de limites.
+- 🛡️ Verificação de bytes em tempo constante (`constant_time_eq`) antes de aplicar qualquer patch binário, abortando imediatamente com `PatchMismatch` em caso de divergência.
+- 🛡️ Rastreamento de auditoria criptográfica completo: calcula e relata resumos SHA-256 pré e pós-patch, além de gerar cópias de segurança opcionais `.bak`.
+- 🛡️ Limpeza proativa de memória via `zeroize` em buffers mutáveis de patches binários ao serem desalocados.
 
 </details>
 
 ---
 
-## 📄 Licença e Atribuição
+## 📄 Licença e atribuição
 
 <details open>
-<summary><b>📄 Licença e Atribuição</b></summary>
+<summary><b>📄 Licença e atribuição</b></summary>
 <br>
 
-Licenciado sob a Apache License 2.0 com arquivo NOTICE. Propriedade de GHSFS.
+Distribuído sob a Licença Apache, Versão 2.0 com arquivo de atribuição NOTICE. De propriedade da GHSFS.
 
 ```text
 Copyright 2026 GHSFS (https://github.com/GHSFS)
