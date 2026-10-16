@@ -6,14 +6,14 @@
 </p>
 
 <p align="center">
-  <img src="../assets/locales/ar/banner.svg" alt="BinSentinel (bsentinel) banner" width="100%" />
+  <img src="../assets/locales/ar/banner.svg" alt="شعار BinSentinel (bsentinel)" width="100%" />
 </p>
 
 <div align="center">
 
 # 🛡️ BinSentinel (bsentinel)
 
-**أداة التحليل الجنائي للملفات الثنائية، ومحلل PE/ELF الثابت، وكاشف الإنتروبيا وتعديل البايتات بلغة Rust**
+**مجموعة أدوات التحليل الجنائي للملفات الثنائية، ومحلل PE/ELF الساكن، وكاشف إنتروبيا حزم التغليف وتطبيق ترقيع البايتات دون أي تبعيات خارجية**
 
 [![CI](https://github.com/GHSFS/bin-sentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/GHSFS/bin-sentinel/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../../LICENSE)
@@ -30,117 +30,117 @@
 <summary><b>🔍 نظرة عامة</b></summary>
 <br>
 
-أداة bin-sentinel (bsentinel) هي حزمة سطر أوامر مستقلة مكتوبة بالكامل بلغة Rust الآمنة لتحليل الملفات التنفيذية الثابتة، وفرز الهندسة العكسية، وتطبيق التعديلات الثنائية الموثقة بدقة عالية ودون أي اعتماديات خارجية.
+bin-sentinel (bsentinel) هي مجموعة أدوات متكاملة في ملف تنفيذي واحد للتحليل الساكن للملفات الثنائية وفرز الهندسة العكسية وتطبيق ترقيع البايتات التقريري، مبنية بلغة Rust الآمنة تمامًا في الذاكرة بنسبة 100%. صُممت لمحلي الأمن الرقمي وباحثي البرمجيات الخبيثة ومهندسي الأنظمة الذين يحتاجون إلى فحص حتمي وسريع للملفات الثنائية غير الموثوقة دون الحاجة إلى تبعيات تشغيل خارجية ثقيلة.
 
 </details>
 
 ---
 
-## 🏛️ البنية الأساسية وخط أنابيب الفحص
+## 🏛️ البنية الأساسية ومسار الفحص والتحليل
 
 <details open>
-<summary><b>🏛️ البنية الأساسية وخط أنابيب الفحص</b></summary>
+<summary><b>🏛️ البنية الأساسية ومسار الفحص والتحليل</b></summary>
 <br>
 
 <p align="center">
-  <img src="../assets/locales/ar/architecture.svg" alt="البنية الأساسية وخط أنابيب الفحص" width="100%" />
+  <img src="../assets/locales/ar/architecture.svg" alt="البنية الأساسية ومسار الفحص والتحليل" width="100%" />
 </p>
 
-| # | الوحدة | ملف المصدر | القدرة الأساسية وضمانات الأمان |
+| # | اسم الوحدة | الملف المصدري | القدرة الوظيفية الأساسية ومحددات الأمان |
 |---|---|---|---|
-| **01** | **محلل PE32/PE32+ الثابت** | `src/pe.rs` | تحليل موثوق الحدود لترويسات DOS/COFF/Optional وعلامات ASLR/DEP/CFG وكشف أقسام RWX الشاذة |
-| **02** | **الإنتروبيا وكشف برامج الضغط** | `src/entropy.rs` | حساب إنتروبيا شانون واختبار مربع كاي وكشف توقيعات UPX وVMProtect وThemida |
-| **03** | **ماسح النصوص ومؤشرات IoC** | `src/strings.rs` | استخراج نصوص ASCII وUTF-16LE وتصنيف الروابط وعناوين IPv4 ومفاتيح السجل وواجهات Win32 الحساسة |
-| **04** | **محرك تعديل البايتات الموثق** | `src/patch.rs` | تحقق زمني ثابت من البايتات المتوقعة، وبصمات SHA-256 قبل وبعد التعديل مع نسخ احتياطي .bak ومسح الذاكرة |
-| **05** | **واجهة CLI ومخرجات JSON** | `src/cli.rs` | مولد ملفات PE64 قياسية للاختبار ودعم مخرجات --json لخطوط التكامل المستمر |
+| **01** | **محلل PE32/PE32+ الساكن** | `src/pe.rs` | تحليل محمي الحدود لترويسات DOS و COFF والترويسات الاختيارية، وتخفيفات ASLR/DEP/CFG وشذوذ قطاعات RWX |
+| **02** | **إنتروبيا وتحليلات حزم التغليف** | `src/entropy.rs` | حساب إنتروبيا شانون (0..8 bits/B)، واختبار تجانس كاي-تربيع وكشف أدوات التغليف UPX/VMProtect/Themida |
+| **03** | **ماسح النصوص ومؤشرات الاختراق** | `src/strings.rs` | استخراج سلاسل نصوص ASCII و UTF-16LE وتصنيف الروابط وعناوين IPv4 ومفاتيح السجل ودوال Win32 الحساسة |
+| **04** | **مرقع البايتات التقريري** | `src/patch.rs` | التحقق بزمن ثابت من البايتات الأصلية، وملخصات SHA-256 قبل وبعد الترقيع، والنسخ الاحتياطي .bak ومسح الذاكرة عبر Zeroize |
+| **05** | **واجهة CLI ومحرك JSON الهيكلي** | `src/cli.rs` | منشئ حتمي لملفات PE64 التجريبية (synth-pe) ومخرجات بصيغة --json قابلة للقراءة آليًا لمسارات التكامل المستمر CI |
 
 </details>
 
 ---
 
-## ⚡ البدء السريع واستخدام الأوامر
+## ⚡ البدء السريع واستخدام سطر الأوامر
 
 <details open>
-<summary><b>⚡ البدء السريع واستخدام الأوامر</b></summary>
+<summary><b>⚡ البدء السريع واستخدام سطر الأوامر</b></summary>
 <br>
 
 ```bash
-# 1. Build release binary
+# 1. بناء النسخة المحسنة للإنتاج
 cargo build --release
 
-# 2. Generate a deterministic synthetic PE32+ (64-bit) test binary
+# 2. إنشاء ملف تجريبي حتمي تركيبي بصيغة PE32+ (64 بت)
 bsentinel synth-pe sample.exe
 
-# 3. Inspect PE headers, ASLR/DEP/CFG mitigations, section table & packer heuristics
+# 3. فحص ترويسات PE، وتخفيفات ASLR/DEP/CFG، وجدول القطاعات واستدلالات حزم التغليف
 bsentinel inspect sample.exe
 bsentinel inspect sample.exe --json
 
-# 4. Generate and inspect a deterministic synthetic Linux/BSD ELF64 binary
+# 4. إنشاء وفحص ملف ثنائي حتمي تركيبي لنظام Linux/BSD بصيغة ELF64
 bsentinel synth-elf sample.elf
 bsentinel inspect-elf sample.elf
 bsentinel inspect-elf sample.elf --json
 
-# 5. Run statistical Shannon entropy & Chi-square uniformity analysis
+# 5. تشغيل التحليل الإحصائي لإنتروبيا شانون وتجانس كاي-تربيع
 bsentinel entropy sample.exe --window 512
 bsentinel entropy sample.exe --window 512 --json
 
-# 6. Extract printable ASCII & UTF-16LE strings and filter Indicators of Compromise (IoCs)
+# 6. استخراج سلاسل نصوص ASCII و UTF-16LE وتصفية مؤشرات الاختراق (IoCs)
 bsentinel strings sample.exe --min-len 4
 bsentinel strings sample.exe --ioc-only --json
 
-# 7. Scan binary for embedded cryptographic constants, AES S-Boxes, SHA/ChaCha20 keys & CRC tables
+# 7. مسح الملف الثنائي بحثًا عن الثوابت التشفيرية المضمنة ومصفوفات AES S-Box ومفاتيح التجزئة وجداول CRC
 bsentinel crypto-scan sample.exe
 bsentinel crypto-scan sample.exe --json
 
-# 8. Inspect PE Import/Export tables (IAT/EAT), compute imphash & resolve dynamic API hashes
+# 8. فحص جداول استيراد وتصدير PE (IAT/EAT)، واحتساب imphash وحل تجزئات دوال API الديناميكية
 bsentinel imports sample.exe
 bsentinel imports sample.exe --resolve-hash 0x0726774C --json
 
-# 9. Apply a verified declarative byte patch with expected-byte check and .bak backup
+# 9. تطبيق ترقيع بايتات تقريري تم التحقق منه مع مطابقة البايتات المتوقعة والنسخ الاحتياطي .bak
 bsentinel patch sample.exe --offset 0x200 --expect 4883EC28 --replace 90909090 --backup --json
 
-# 10. Scan x86_64 prologues, direct syscalls, RDTSC anti-debug & CPUID checks
+# 10. مسح مقدمات دوال x86_64، ونداءات النظام المباشرة (Direct Syscalls)، وفحوصات منع التنقيح RDTSC و CPUID
 bsentinel scan-code sample.exe
 bsentinel scan-code sample.exe --json
 
-# 11. Scan declarative YARA-style hex signatures with wildcards, byte jumps & JSON rules
+# 11. مسح التواقيع الست عشرية التقريرية بأسلوب YARA مع الرموز البديلة والقفزات وقواعد JSON
 bsentinel rule-scan sample.exe --pattern "48 83 EC ?? [2-6] E8"
 bsentinel rule-scan sample.exe --rules rules.json --json
 
-# 12. Compare two binaries structurally and export a declarative JSON patch recipe
+# 12. مقارنة ملفين ثنائيين هيكليًا وتصدير وصفة ترقيع تقريرية بصيغة JSON
 bsentinel diff baseline.exe modified.exe --out-recipe patch.json
 bsentinel diff baseline.exe modified.exe --json
 
-# 13. Apply or reverse a declarative patch recipe with dry-run verification and backup
+# 13. تطبيق أو التراجع عن وصفة ترقيع تقريرية مع الفحص المسبق (dry-run) والنسخ الاحتياطي
 bsentinel apply-recipe baseline.exe patch.json --dry-run
 bsentinel apply-recipe baseline.exe patch.json --backup
 bsentinel apply-recipe baseline.exe patch.json --reverse
 
-# 14. Decode PE Rich header, fingerprint Visual Studio toolchains & verify 32-bit checksum
+# 14. فك تشفير ترويسة PE Rich، وتحديد بصمة سلاسل أدوات Visual Studio والتحقق من المجموع الاختباري
 bsentinel rich sample.exe
 bsentinel rich sample.exe --json
 
-# 15. Brute-force single/multi-byte XOR, ADD & ROL deobfuscation to uncover hidden IoCs and headers
+# 15. كسر تشويش XOR و ADD و ROL للبايت الفردي والمتعدد بالقوة الغاشمة لكشف مؤشرات الاختراق والترويسات
 bsentinel xor-scan sample.exe
 bsentinel xor-scan sample.exe --json
 
-# 16. Inspect PE Resource Directory (.rsrc), extract manifest, UAC execution levels & version info
+# 16. فحص دليل موارد PE (.rsrc)، واستخراج ملفات البيان ومستويات تشغيل UAC ومعلومات الإصدار
 bsentinel resources sample.exe
 bsentinel resources sample.exe --json
 
-# 17. Inspect PE TLS callbacks, pre-main execution hooks & x64 exception unwind (.pdata) tables
+# 17. فحص نداءات PE TLS الرجعية، وخطافات التنفيذ قبل main، وجداول استثناءات x64 (.pdata)
 bsentinel callbacks sample.exe
 bsentinel callbacks sample.exe --json
 
-# 18. Carve and decode embedded Base64, URL-safe Base64 & hex payloads with safe extraction
+# 18. استخراج وفك تشفير حمولات Base64 و URL-Safe Base64 والترميز الست عشري المضمنة بأمان
 bsentinel carve sample.exe
 bsentinel carve sample.exe --extract-dir ./extracted_payloads --json
 
-# 19. Compute rolling-hash piecewise fuzzy similarity digest (CTPH / SSDEEP) and section fingerprints
+# 19. حساب ملخص التشابه الغامض المقطعي بالتجزئة المتدحرجة (CTPH / SSDEEP) وبصمات القطاعات
 bsentinel fuzzy-hash sample.exe
 bsentinel fuzzy-hash sample.exe --json
 
-# 20. Compare binary artifacts and correlate section-by-section fuzzy similarity scores (0..=100)
+# 20. مقارنة الملفات الثنائية وربط درجات التشابه الغامض قطاعًا بقطاع (0..=100)
 bsentinel fuzzy-compare original.exe modified.exe
 bsentinel fuzzy-compare original.exe modified.exe --json
 ```
@@ -149,89 +149,89 @@ bsentinel fuzzy-compare original.exe modified.exe --json
 
 ---
 
-## 📦 هيكل المستودع
+## 📦 بنية المستودع وشجرة الملفات المصدرية
 
 <details open>
-<summary><b>📦 هيكل المستودع</b></summary>
+<summary><b>📦 بنية المستودع وشجرة الملفات المصدرية</b></summary>
 <br>
 
 ```text
 bin-sentinel/
-├── Cargo.toml                     # Pure-Rust package manifest (bsentinel binary + bin_sentinel lib)
-├── README.md                      # Root English documentation with 10-language navigation
-├── ROADMAP.md                     # Public engineering roadmap
-├── CHANGELOG.md                   # Keep-a-Changelog release history
-├── SECURITY.md                    # Binary parsing & memory safety policy
-├── LICENSE                        # Apache License 2.0
-├── NOTICE                         # Attribution notice owned by GHSFS
+├── Cargo.toml                     # ملف تعريف حزمة Rust الخالصة (أداة bsentinel التنفيذية ومكتبة bin_sentinel)
+├── README.md                      # التوثيق الأساسي باللغة الإنجليزية مع شريط تنقل لـ 10 لغات
+├── ROADMAP.md                     # خارطة طريق التطوير الهندسي العامة
+├── CHANGELOG.md                   # سجل الإصدارات والتحديثات وفق Keep-a-Changelog
+├── SECURITY.md                    # أمان الذاكرة وسياسة تحليل الملفات الثنائية
+├── LICENSE                        # رخصة Apache 2.0
+├── NOTICE                         # إشعار الإسناد وحقوق النشر المملوكة لـ GHSFS
 ├── src/
-│   ├── lib.rs                     # Library module exports
-│   ├── main.rs                    # Streamlined CLI entry point dispatching to commands
-│   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, scan-code, rule-scan, rich, xor-scan, carve, etc.)
-│   ├── commands/                  # Modular CLI subcommands (inspect, forensics, rules, diff, authenticode, macho, rich, callbacks, carve, fuzzy)
-│   ├── error.rs                   # Unified SentinelError & Result<T>
-│   ├── pe.rs                      # Zero-dependency PE32/PE32+ header & section parser + synthetic PE64 builder
-│   ├── elf/                       # Zero-dependency Linux/BSD ELF64 parser (headers, mod, synthetic builder)
-│   ├── imports/                   # PE Import/Export (IAT/EAT) parser, RFC 1321 MD5 imphash & dynamic API hash resolver
-│   ├── crypto_scan/               # Embedded cryptographic primitives, AES/SM4 S-Boxes & hash constants scanner
-│   ├── disasm/                    # x86_64 prologue/epilogue, direct syscalls & control-flow pattern scanner
-│   ├── rules/                     # Declarative YARA-style hex signature, nibble wildcard & byte jump scanner
-│   ├── rich/                      # PE Rich header decoder, MSVC compiler toolchain fingerprinter & checksum validator
-│   ├── deobfuscate/               # Single/multi-byte XOR, ADD & ROL deobfuscation scanner & key recovery
-│   ├── resources/                 # PE 3-level resource directory (.rsrc), application manifest & version info parser
-│   ├── callbacks/                 # PE TLS callbacks, pre-main hooks & x64 .pdata exception unwind tables
-│   ├── carve/                     # Base64, URL-safe Base64 & hex payload carving, decoding & classification
-│   ├── fuzzy_hash/                # CTPH rolling hash engine, dual block size scaling & binary similarity compare
-│   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
-│   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
-│   ├── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
-│   └── diff/                      # Structural binary diffing & declarative patch recipe engine
+│   ├── lib.rs                     # واجهات المكتبة البرمجية العامة
+│   ├── main.rs                    # نقطة الدخول الرئيسية للـ CLI لتوزيع الأوامر
+│   ├── cli.rs                     # تعريفات الأوامر الفرعية عبر Clap (inspect, imports, rich, carve الخ)
+│   ├── commands/                  # معالجات أوامر CLI المعيارية (inspect, forensics, rules, diff, rich الخ)
+│   ├── error.rs                   # نموذج الأخطاء الموحد SentinelError و Result<T>
+│   ├── pe.rs                      # محلل ترويسات وقطاعات PE32/PE32+ ومولد PE64 بدون تبعيات
+│   ├── elf/                       # محلل ملفات Linux/BSD ELF64 (الترويسات، الوحدات، منشئ تركيبي)
+│   ├── imports/                   # محلل جداول استيراد/تصدير PE (IAT/EAT) وبصمة imphash وحل تجزئات API
+│   ├── crypto_scan/               # ماسح الثوابت التشفيرية المضمنة ومصفوفات AES/SM4 S-Box والتجزئة
+│   ├── disasm/                    # ماسح مقدمات x86_64، ونداءات النظام المباشرة وأنماط التحكم
+│   ├── rules/                     # ماسح التواقيع التقريرية بأسلوب YARA والرموز البديلة والقفزات
+│   ├── rich/                      # مفكك ترويسة PE Rich وبصمات أدوات MSVC والتحقق من المجموع الاختباري
+│   ├── deobfuscate/               # ماسح كسر تشويش XOR و ADD و ROL واستعادة مفاتيح التشفير
+│   ├── resources/                 # محلل دليل موارد PE ثلاثي المستويات (.rsrc) وبيان التطبيق والإصدار
+│   ├── callbacks/                 # نداءات TLS الرجعية وخطافات ما قبل main وجداول x64 .pdata
+│   ├── carve/                     # مستخرج ومصنف حمولات Base64 و URL-Safe Base64 والترميز الست عشري
+│   ├── fuzzy_hash/                # محرك التجزئة المتدحرجة CTPH ومقارنة التشابه بين الملفات الثنائية
+│   ├── entropy.rs                 # إنتروبيا شانون، واختبار تجانس كاي-تربيع وكاشف أدوات التغليف
+│   ├── strings.rs                 # مستخرج نصوص ASCII و UTF-16LE ومصنف مؤشرات الاختراق IoCs
+│   ├── patch.rs                   # محرك ترقيع بايتات تم التحقق منه بزمن ثابت عبر SHA-256 و Zeroize
+│   └── diff/                      # مقارنة الفروق الثنائية الهيكلية ومحرك وصفات الترقيع التقريرية
 ├── tests/
-│   ├── pe_entropy_test.rs         # Integration tests for PE64 parsing, mitigations, entropy & CLI JSON
-│   ├── patch_strings_test.rs      # Integration tests for IoC extraction, verified patching & backups
-│   ├── elf_test.rs                # Integration tests for ELF64 parsing, PIE/RELRO/NX mitigations & dynamic symbols
-│   ├── crypto_scan_test.rs        # Integration tests for cryptographic constants, S-Boxes & PE/ELF section mapping
-│   ├── imports_test.rs            # Integration tests for PE IAT/EAT tables, imphash & dynamic API hash resolution
-│   ├── carve_test.rs              # Integration tests for Base64/Hex carving, PowerShell cradles, safe extraction & CLI
-│   ├── disasm_test.rs             # Integration tests for x86_64 prologues, direct syscalls & anti-debug checks
-│   ├── rules_test.rs              # Integration tests for YARA-style hex wildcards, jumps, strings & JSON rule sets
-│   ├── diff_test.rs               # Integration tests for structural diffing, patch recipes & atomic reversal
-│   ├── rich_test.rs               # Integration tests for PE Rich header decoding, toolchain fingerprinting & checksums
-│   ├── deobfuscate_test.rs        # Integration tests for XOR/ADD/ROL deobfuscation, crib dragging & payload classifiers
-│   ├── resources_test.rs          # Integration tests for PE resource directory tree, UAC manifest & version info
-│   ├── callbacks_test.rs          # Integration tests for TLS callbacks, pre-main alerts, pdata tables & exception handlers
-│   ├── fuzzy_hash_test.rs         # Integration tests for CTPH fuzzy hashing, Levenshtein distance & binary comparison
+│   ├── pe_entropy_test.rs         # اختبارات تحليل PE64 والتخفيفات والإنتروبيا ومخرجات JSON
+│   ├── patch_strings_test.rs      # اختبارات استخراج مؤشرات الاختراق والترقيع والنسخ الاحتياطي
+│   ├── elf_test.rs                # اختبارات تحليل ELF64 وتخفيفات PIE/RELRO/NX والرموز الديناميكية
+│   ├── crypto_scan_test.rs        # اختبارات الثوابت التشفيرية و S-Box وتعيين قطاعات PE/ELF
+│   ├── imports_test.rs            # اختبارات جداول PE IAT/EAT وبصمة imphash وحل تجزئات API
+│   ├── carve_test.rs              # اختبارات استخراج Base64/Hex ونصوص PowerShell والتفريغ الآمن
+│   ├── disasm_test.rs             # اختبارات مقدمات x86_64 ونداءات النظام وفحوصات منع التنقيح
+│   ├── rules_test.rs              # اختبارات تواقيع YARA الست عشرية والقفزات وقواعد JSON
+│   ├── diff_test.rs               # اختبارات الفروق الهيكلية ووصفات الترقيع والتراجع الذري
+│   ├── rich_test.rs               # اختبارات فك ترويسة PE Rich وبصمات أدوات البناء والمجموع الاختباري
+│   ├── deobfuscate_test.rs        # اختبارات كسر تشويش XOR/ADD/ROL وسحب النصوص وتصنيف الحمولات
+│   ├── resources_test.rs          # اختبارات شجرة دليل موارد PE وبيان UAC ومعلومات الإصدار
+│   ├── callbacks_test.rs          # اختبارات نداءات TLS وخطافات التنفيذ وجداول pdata ومعالجة الاستثناءات
+│   ├── fuzzy_hash_test.rs         # اختبارات التجزئة الغامضة CTPH ومسافة ليفنشتاين والمقارنة الثنائية
 └── docs/
-    ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
-    └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams
+    ├── locales/                   # مجلد الترجمات متعدد اللغات (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
+    └── assets/locales/            # لافتات SVG ورسوم بيانية مستضافة ذاتيًا لكل اللغات
 ```
 
 </details>
 
 ---
 
-## 🔒 سلامة الذاكرة وضمانات الأمان
+## 🔒 أمان الذاكرة ومحددات الحماية البرمجية
 
 <details open>
-<summary><b>🔒 سلامة الذاكرة وضمانات الأمان</b></summary>
+<summary><b>🔒 أمان الذاكرة ومحددات الحماية البرمجية</b></summary>
 <br>
 
-- 🛡️ خلو كامل من كتل unsafe في جميع محللات الترويسات مع فحص صارم للحدود.
-- 🛡️ مقارنة البايتات المتوقعة بزمن ثابت (constant_time_eq) قبل كتابة أي تعديل.
-- 🛡️ توثيق كامل عبر بصمات SHA-256 قبل التعديل وبعده مع دعم النسخ الاحتياطي التلقائي.
-- 🛡️ تصفير المخازن المؤقتة الحساسة في الذاكرة فور انتهاء العملية باستخدام zeroize.
+- 🛡️ صفر كتل `unsafe` عبر جميع محللات ترويسات الملفات الثنائية: يتم استخدام عمليات حسابية محكومة الحدود عند قراءة أي إزاحة أو شريحة بيانات.
+- 🛡️ التحقق بزمن ثابت من البايتات (`constant_time_eq`) قبل تطبيق أي ترقيع ثنائي، مع الإلغاء الفوري برسالة `PatchMismatch` عند أي تباين.
+- 🛡️ سجل تدقيق تشفيري متكامل: يتم حساب وتوثيق ملخصات SHA-256 قبل وبعد الترقيع مع دعم إنشاء نسخ احتياطية اختيارية `.bak`.
+- 🛡️ مسح استباقي آمن للذاكرة المؤقتة عبر `zeroize` لحاويات البايتات المتغيرة عند تحريرها.
 
 </details>
 
 ---
 
-## 📄 الترخيص وحقوق الملكية
+## 📄 الترخيص والإسناد
 
 <details open>
-<summary><b>📄 الترخيص وحقوق الملكية</b></summary>
+<summary><b>📄 الترخيص والإسناد</b></summary>
 <br>
 
-مرخص بموجب Apache License 2.0 مع ملف NOTICE. مملوك لـ GHSFS.
+مرخص بموجب رخصة Apache License 2.0 مع ملف إشعار الإسناد NOTICE. مملوك لـ GHSFS.
 
 ```text
 Copyright 2026 GHSFS (https://github.com/GHSFS)
