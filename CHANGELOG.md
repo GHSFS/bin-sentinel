@@ -5,6 +5,32 @@ All notable changes to `bin-sentinel` (`bsentinel`) will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] - 2026-10-16
+
+### Added
+- Context Triggered Piecewise Hashing (CTPH / SSDEEP-style) & Fuzzy Similarity Engine (`src/fuzzy_hash/`):
+  - Pure-Rust rolling hash engine (`engine.rs`):
+    - 7-byte sliding window with rolling Adler-style update and shift-XOR accumulator.
+    - Constant-time $O(1)$ byte rolling operations with automatic wrapping integer protection.
+    - Adaptive block size calculation scaling geometrically ($3 \times 2^k$) based on input length.
+    - Parallel dual-block hashing ($B$ and $2B$) with FNV-1a block accumulators and Base64 alphabet.
+    - Triple consecutive identical character run deduplication heuristic preventing buffer flooding.
+    - Explicit memory wiping with `Zeroize` on block accumulators and rolling window states.
+  - Multi-dimensional similarity scoring and comparison engine (`compare.rs`):
+    - Space-efficient Levenshtein edit distance ($O(\min(M, N))$ auxiliary memory).
+    - Longest common substring (LCS) detection with adaptive minimum match triggers.
+    - Dual-block fuzzy digest alignment (matching $B_1$ with $B_2$ across $1\times$ and $2\times$ block ratios).
+    - Normalized similarity scoring ($0..=100$) with descriptive classifications (`Identical`, `High Match`, `Moderate Match`, `Low Match`, `Divergent`, `No Commonality`).
+  - Executable format detection and section-level fuzzy hashing (`mod.rs`):
+    - Automatic section resolution across Windows PE32/PE64 (`.text`, `.rdata`, etc.), Linux ELF64, and Apple Mach-O binaries.
+    - Per-section fuzzy digests, virtual addresses, raw sizes, and Shannon entropy profiling.
+    - Cross-binary section-by-section fuzzy comparison matching sections by name and identifying mutated or missing segments.
+  - CLI subcommands:
+    - `bsentinel fuzzy-hash <file> [--json]`: formatted terminal report with overall digest and section fingerprints table, plus structured machine-readable JSON telemetry.
+    - `bsentinel fuzzy-compare <f1> <f2> [--json]`: overall artifact similarity scoring and detailed section-by-section comparison matrix with JSON output.
+  - Comprehensive integration test suite (`tests/fuzzy_hash_test.rs`):
+    - 11 unit and integration tests covering empty/small buffers, identical buffers, mutation sensitivity, uncorrelated buffers, synthetic PE and ELF section hashing, digest string serialization/parsing, CLI JSON/table formatting, and programmatic comparison APIs.
+
 ## [0.14.0] - 2026-10-15
 
 ### Added

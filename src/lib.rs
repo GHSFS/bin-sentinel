@@ -14,6 +14,7 @@ pub mod disasm;
 pub mod elf;
 pub mod entropy;
 pub mod error;
+pub mod fuzzy_hash;
 pub mod imports;
 pub mod macho;
 pub mod patch;

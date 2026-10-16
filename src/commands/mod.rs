@@ -7,6 +7,7 @@ pub mod callbacks;
 pub mod carve;
 pub mod diff;
 pub mod forensics;
+pub mod fuzzy;
 pub mod inspect;
 pub mod macho;
 pub mod resources;
@@ -78,5 +79,9 @@ pub fn dispatch(command: Commands) -> Result<()> {
             extract_dir,
             json,
         } => carve::handle_carve(&file, min_len, extract_dir.as_deref(), json),
+        Commands::FuzzyHash { file, json } => fuzzy::handle_fuzzy_hash(&file, json),
+        Commands::FuzzyCompare { file1, file2, json } => {
+            fuzzy::handle_fuzzy_compare(&file1, &file2, json)
+        }
     }
 }

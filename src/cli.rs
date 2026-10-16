@@ -234,4 +234,22 @@ pub enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Compute rolling hash and piecewise fuzzy similarity digest (CTPH / SSDEEP-style) for a binary.
+    FuzzyHash {
+        /// Target binary file path.
+        file: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Compare fuzzy similarity scores (0..=100) between two binary artifacts or sections.
+    FuzzyCompare {
+        /// First binary file path.
+        file1: PathBuf,
+        /// Second binary file path.
+        file2: PathBuf,
+        /// Output structured JSON report.
+        #[arg(long)]
+        json: bool,
+    },
 }

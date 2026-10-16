@@ -135,6 +135,14 @@ bsentinel callbacks sample.exe --json
 # 18. Carve and decode embedded Base64, URL-safe Base64 & hex payloads with safe extraction
 bsentinel carve sample.exe
 bsentinel carve sample.exe --extract-dir ./extracted_payloads --json
+
+# 19. Compute rolling-hash piecewise fuzzy similarity digest (CTPH / SSDEEP) and section fingerprints
+bsentinel fuzzy-hash sample.exe
+bsentinel fuzzy-hash sample.exe --json
+
+# 20. Compare binary artifacts and correlate section-by-section fuzzy similarity scores (0..=100)
+bsentinel fuzzy-compare original.exe modified.exe
+bsentinel fuzzy-compare original.exe modified.exe --json
 ```
 
 </details>
@@ -160,7 +168,7 @@ bin-sentinel/
 │   ├── lib.rs                     # Library module exports
 │   ├── main.rs                    # Streamlined CLI entry point dispatching to commands
 │   ├── cli.rs                     # Clap derive subcommands (inspect, inspect-elf, imports, crypto-scan, scan-code, rule-scan, rich, xor-scan, carve, etc.)
-│   ├── commands/                  # Modular CLI subcommands (inspect, forensics, rules, diff, authenticode, macho, rich, callbacks, carve)
+│   ├── commands/                  # Modular CLI subcommands (inspect, forensics, rules, diff, authenticode, macho, rich, callbacks, carve, fuzzy)
 │   ├── error.rs                   # Unified SentinelError & Result<T>
 │   ├── pe.rs                      # Zero-dependency PE32/PE32+ header & section parser + synthetic PE64 builder
 │   ├── elf/                       # Zero-dependency Linux/BSD ELF64 parser (headers, mod, synthetic builder)
@@ -173,6 +181,7 @@ bin-sentinel/
 │   ├── resources/                 # PE 3-level resource directory (.rsrc), application manifest & version info parser
 │   ├── callbacks/                 # PE TLS callbacks, pre-main hooks & x64 .pdata exception unwind tables
 │   ├── carve/                     # Base64, URL-safe Base64 & hex payload carving, decoding & classification
+│   ├── fuzzy_hash/                # CTPH rolling hash engine, dual block size scaling & binary similarity compare
 │   ├── entropy.rs                 # Shannon entropy, Chi-Square uniformity & packer heuristic detector
 │   ├── strings.rs                 # ASCII & UTF-16LE string extractor + IoC classifier
 │   ├── patch.rs                   # Constant-time verified byte patching engine with SHA-256 & Zeroize
@@ -191,6 +200,7 @@ bin-sentinel/
 │   ├── deobfuscate_test.rs        # Integration tests for XOR/ADD/ROL deobfuscation, crib dragging & payload classifiers
 │   ├── resources_test.rs          # Integration tests for PE resource directory tree, UAC manifest & version info
 │   ├── callbacks_test.rs          # Integration tests for TLS callbacks, pre-main alerts, pdata tables & exception handlers
+│   ├── fuzzy_hash_test.rs         # Integration tests for CTPH fuzzy hashing, Levenshtein distance & binary comparison
 └── docs/
     ├── locales/                   # Localized READMEs (ko, zh-CN, es, hi, ar, pt-BR, ru, fr, id)
     └── assets/locales/            # Localized self-hosted SVG banners & architecture diagrams
